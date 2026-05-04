@@ -1,21 +1,1335 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        /* Some styles */
-    </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="RJM Import-Export EIRL – Importación, comercialización y desarrollo de productos para guitarra, luthiers y fabricación digital. Ayacucho, Perú."/>
+<title>RJM Import-Export EIRL | Accesorios, Electrónica & Luthiería</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ============================================================
+   VARIABLES & RESET
+   ============================================================ */
+:root{
+  --bg:        #080c12;
+  --surface:   #0d1421;
+  --surface2:  #111927;
+  --panel:     #141e2e;
+  --border:    rgba(56,120,210,0.18);
+  --border2:   rgba(56,120,210,0.08);
+  --blue:      #2563eb;
+  --blue-lite: #3b82f6;
+  --cyan:      #06b6d4;
+  --accent:    #0ea5e9;
+  --text:      #94afc8;
+  --text2:     #c8d8eb;
+  --white:     #eef4ff;
+  --mono:      'IBM Plex Mono', monospace;
+  --sans:      'IBM Plex Sans', sans-serif;
+  --display:   'Syne', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:var(--sans);
+  font-weight:300;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:2px}
+
+/* ============================================================
+   REUSABLE
+   ============================================================ */
+.container{max-width:1200px;margin:0 auto;padding:0 2rem}
+.tag{
+  display:inline-flex;align-items:center;gap:.5rem;
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cyan);border:1px solid rgba(6,182,212,.25);
+  padding:.3rem .8rem;margin-bottom:1.2rem;
+}
+.tag::before{content:'▶';font-size:.4rem}
+.section-title{
+  font-family:var(--display);font-size:clamp(1.8rem,3.5vw,2.8rem);
+  font-weight:700;color:var(--white);line-height:1.15;margin-bottom:.8rem;
+}
+.section-sub{font-size:.95rem;color:var(--text);max-width:560px;line-height:1.75}
+section{padding:6rem 0}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:900;
+  background:rgba(8,12,18,.92);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  padding:0 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+  height:64px;
+}
+.nav-logo{
+  font-family:var(--display);font-weight:800;font-size:1.1rem;
+  color:var(--white);letter-spacing:-.01em;
+  display:flex;align-items:center;gap:.6rem;
+}
+.nav-logo-badge{
+  background:var(--blue);color:#fff;
+  font-family:var(--mono);font-size:.55rem;letter-spacing:.12em;
+  padding:.2rem .5rem;font-weight:500;
+}
+.nav-links{display:flex;align-items:center;gap:2rem;list-style:none}
+.nav-links a{
+  font-family:var(--sans);font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text);transition:color .25s;
+}
+.nav-links a:hover{color:var(--white)}
+.nav-cta{
+  background:var(--blue);color:#fff !important;
+  padding:.5rem 1.2rem;font-weight:500 !important;
+  transition:background .25s !important;
+}
+.nav-cta:hover{background:var(--blue-lite) !important}
+.nav-toggle{display:none;flex-direction:column;gap:4px;cursor:pointer;padding:.5rem}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--text2);transition:.3s}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+#hero{
+  min-height:100vh;padding-top:64px;
+  display:flex;align-items:center;
+  position:relative;overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(37,99,235,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37,99,235,.04) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+}
+.hero-glow{
+  position:absolute;top:10%;right:-10%;
+  width:700px;height:700px;
+  background:radial-gradient(circle, rgba(37,99,235,.12) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-glow2{
+  position:absolute;bottom:-5%;left:-10%;
+  width:500px;height:500px;
+  background:radial-gradient(circle, rgba(6,182,212,.07) 0%, transparent 70%);
+  pointer-events:none;
+}
+.hero-inner{
+  position:relative;z-index:2;
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:4rem;align-items:center;
+  padding:4rem 2rem;max-width:1200px;margin:0 auto;width:100%;
+}
+.hero-eyebrow{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.25em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:.8rem;
+}
+.hero-eyebrow::before{
+  content:'';display:block;width:32px;height:1px;background:var(--cyan);
+}
+.hero-title{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(2.4rem,5vw,4rem);
+  color:var(--white);line-height:1.05;margin-bottom:1.5rem;
+}
+.hero-title .hl{
+  background:linear-gradient(90deg,var(--blue-lite),var(--cyan));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-desc{font-size:1rem;line-height:1.8;color:var(--text);max-width:480px;margin-bottom:2.5rem}
+.hero-actions{display:flex;gap:1rem;flex-wrap:wrap;align-items:center}
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;
+  font-family:var(--sans);font-size:.82rem;font-weight:500;
+  letter-spacing:.08em;text-transform:uppercase;
+  padding:.75rem 1.8rem;border:none;cursor:pointer;
+  transition:all .3s;
+}
+.btn-primary{
+  background:var(--blue);color:#fff;
+  box-shadow:0 0 0 1px rgba(37,99,235,.5);
+}
+.btn-primary:hover{
+  background:var(--blue-lite);
+  box-shadow:0 0 24px rgba(37,99,235,.4),0 0 0 1px var(--blue-lite);
+  transform:translateY(-1px);
+}
+.btn-ghost{
+  background:transparent;color:var(--text2);
+  box-shadow:0 0 0 1px var(--border);
+}
+.btn-ghost:hover{box-shadow:0 0 0 1px var(--blue-lite);color:var(--white);transform:translateY(-1px)}
+.hero-visual{position:relative}
+.hero-card-main{
+  background:var(--surface);border:1px solid var(--border);
+  padding:2rem;position:relative;overflow:hidden;
+}
+.hero-card-main::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),transparent);
+}
+.hero-card-label{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:1rem;opacity:.7;
+}
+.hero-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border2)}
+.metric{
+  background:var(--surface);padding:1.2rem 1rem;text-align:center;
+}
+.metric-val{
+  font-family:var(--display);font-size:1.8rem;font-weight:700;
+  color:var(--white);display:block;line-height:1;
+}
+.metric-label{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--text);opacity:.6;margin-top:.4rem;
+  display:block;
+}
+.hero-badges{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.5rem}
+.badge{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text);border:1px solid var(--border);
+  padding:.3rem .7rem;
+}
+.badge.active{color:var(--cyan);border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.06)}
+
+/* ============================================================
+   STATS BAR
+   ============================================================ */
+.stats-bar{
+  background:var(--surface);border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:1.5rem 2rem;
+}
+.stats-inner{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:0;
+}
+.stat-item{
+  display:flex;flex-direction:column;align-items:center;
+  padding:1rem;border-right:1px solid var(--border);text-align:center;
+}
+.stat-item:last-child{border-right:none}
+.stat-n{
+  font-family:var(--display);font-size:1.7rem;font-weight:700;
+  color:var(--blue-lite);line-height:1;
+}
+.stat-l{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text);opacity:.6;margin-top:.3rem}
+
+/* ============================================================
+   PRODUCTS
+   ============================================================ */
+#productos{background:var(--bg)}
+.products-header{margin-bottom:3.5rem}
+.tabs{display:flex;gap:0;border:1px solid var(--border);width:fit-content;margin-top:2rem;flex-wrap:wrap}
+.tab{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--text);padding:.6rem 1.2rem;cursor:pointer;
+  border-right:1px solid var(--border);background:transparent;border-top:none;border-bottom:none;border-left:none;
+  transition:all .25s;
+}
+.tab:last-child{border-right:none}
+.tab.active,.tab:hover{background:var(--blue);color:#fff}
+
+.products-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:1px;background:var(--border2);
+}
+.product-card{
+  background:var(--surface);padding:0;
+  transition:all .3s;position:relative;overflow:hidden;
+  cursor:pointer;
+}
+.product-card::after{
+  content:'';position:absolute;bottom:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  transform:scaleX(0);transform-origin:left;transition:transform .35s;
+}
+.product-card:hover{background:var(--panel);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.4)}
+.product-card:hover::after{transform:scaleX(1)}
+
+.product-img{
+  width:100%;aspect-ratio:4/3;overflow:hidden;
+  background:var(--panel);position:relative;
+}
+.product-img img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform .5s ease;filter:brightness(.85) saturate(.9);
+}
+.product-card:hover .product-img img{transform:scale(1.06);filter:brightness(.95) saturate(1.1)}
+.product-img-ph{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.5rem;
+  background:linear-gradient(135deg,#0d1421 0%,#111927 100%);
+  color:var(--blue-lite);font-size:2.5rem;
+}
+.product-img-ph span{font-family:var(--mono);font-size:.55rem;letter-spacing:.15em;text-transform:uppercase;color:var(--text);opacity:.4}
+.product-badge{
+  position:absolute;top:.75rem;left:.75rem;
+  font-family:var(--mono);font-size:.55rem;letter-spacing:.12em;text-transform:uppercase;
+  background:var(--blue);color:#fff;padding:.25rem .6rem;
+}
+.product-info{padding:1.2rem 1.2rem 1.4rem}
+.product-cat{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--cyan);opacity:.7;margin-bottom:.35rem;
+}
+.product-name{
+  font-family:var(--display);font-size:1rem;font-weight:600;
+  color:var(--white);margin-bottom:.4rem;line-height:1.3;
+}
+.product-desc{font-size:.78rem;color:var(--text);line-height:1.6;margin-bottom:1rem;opacity:.8}
+.product-action{
+  display:inline-flex;align-items:center;gap:.4rem;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--blue-lite);border:1px solid rgba(59,130,246,.3);
+  padding:.35rem .8rem;text-decoration:none;
+  transition:all .25s;
+}
+.product-action:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+/* Category sections */
+.cat-section{margin-bottom:4rem}
+.cat-section-title{
+  font-family:var(--display);font-size:1.2rem;font-weight:700;
+  color:var(--white);margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:1rem;
+  padding-bottom:.8rem;border-bottom:1px solid var(--border);
+}
+.cat-section-title::before{
+  content:'';display:block;width:4px;height:1.4rem;background:var(--blue);
+}
+
+/* ============================================================
+   SERVICES
+   ============================================================ */
+#servicios{background:var(--surface)}
+.services-grid{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--border2);margin-top:3rem;
+}
+.service-card{
+  background:var(--surface);padding:2.5rem;
+  transition:background .3s;position:relative;overflow:hidden;
+}
+.service-card::before{
+  content:'';position:absolute;top:0;left:0;width:3px;height:0;
+  background:linear-gradient(180deg,var(--blue),var(--cyan));
+  transition:height .4s;
+}
+.service-card:hover{background:var(--panel)}
+.service-card:hover::before{height:100%}
+.service-icon{
+  font-size:2.2rem;margin-bottom:1.2rem;
+  display:inline-flex;align-items:center;justify-content:center;
+  width:56px;height:56px;
+  background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);
+}
+.service-name{
+  font-family:var(--display);font-size:1.2rem;font-weight:700;
+  color:var(--white);margin-bottom:.6rem;
+}
+.service-desc{font-size:.85rem;line-height:1.75;color:var(--text);margin-bottom:1.2rem}
+.service-features{list-style:none;display:flex;flex-direction:column;gap:.4rem}
+.service-features li{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;
+  color:var(--text);display:flex;align-items:center;gap:.6rem;
+}
+.service-features li::before{content:'→';color:var(--cyan);font-size:.6rem}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+#sobre{background:var(--bg)}
+.about-inner{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:5rem;align-items:center;
+}
+.about-visual{position:relative}
+.about-main-card{
+  background:var(--surface);border:1px solid var(--border);
+  padding:0;overflow:hidden;position:relative;
+}
+.about-main-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+  z-index:2;
+}
+.about-img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;filter:brightness(.7) saturate(.8)}
+.about-img-ph{
+  width:100%;aspect-ratio:4/3;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#0d1421,#0a1628);
+  font-size:5rem;
+}
+.about-card-footer{
+  padding:1.2rem 1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-top:1px solid var(--border);
+}
+.about-card-footer-label{font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);opacity:.7}
+.about-card-footer-val{font-family:var(--mono);font-size:.75rem;color:var(--white)}
+.about-accent{
+  position:absolute;bottom:-1.5rem;right:-1.5rem;
+  width:80px;height:80px;
+  border-right:2px solid var(--blue);border-bottom:2px solid var(--blue);
+  opacity:.4;
+}
+.about-accent2{
+  position:absolute;top:-1.5rem;left:-1.5rem;
+  width:60px;height:60px;
+  border-left:1px solid var(--cyan);border-top:1px solid var(--cyan);
+  opacity:.3;
+}
+.about-content .section-sub{margin-bottom:2rem}
+.about-values{display:flex;flex-direction:column;gap:0;border:1px solid var(--border)}
+.about-val{
+  display:flex;align-items:flex-start;gap:1rem;
+  padding:1.2rem 1.5rem;border-bottom:1px solid var(--border);
+  transition:background .25s;
+}
+.about-val:last-child{border-bottom:none}
+.about-val:hover{background:var(--panel)}
+.about-val-icon{
+  color:var(--blue-lite);font-size:1.1rem;min-width:1.5rem;margin-top:.1rem;
+}
+.about-val-text strong{
+  display:block;font-family:var(--display);font-size:.9rem;font-weight:600;
+  color:var(--white);margin-bottom:.2rem;
+}
+.about-val-text p{font-size:.78rem;line-height:1.6;opacity:.7}
+
+/* ============================================================
+   CONTACT
+   ============================================================ */
+#contacto{background:var(--surface)}
+.contact-grid{
+  display:grid;grid-template-columns:1fr 1.4fr;
+  gap:4rem;margin-top:3rem;
+}
+.contact-info{display:flex;flex-direction:column;gap:0;border:1px solid var(--border)}
+.contact-item{
+  padding:1.5rem;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:1rem;
+  transition:background .25s;
+}
+.contact-item:last-child{border-bottom:none}
+.contact-item:hover{background:var(--panel)}
+.contact-ico{
+  width:40px;height:40px;
+  background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;min-width:40px;
+}
+.contact-label{
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--cyan);opacity:.7;margin-bottom:.3rem;
+}
+.contact-val{font-size:.9rem;color:var(--white)}
+.contact-val a{color:var(--blue-lite);transition:color .25s}
+.contact-val a:hover{color:var(--cyan)}
+
+/* Form */
+.contact-form{background:var(--panel);border:1px solid var(--border);padding:2rem;position:relative;overflow:hidden}
+.contact-form::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,var(--blue),var(--cyan));
+}
+.form-title{
+  font-family:var(--display);font-size:1.2rem;font-weight:700;
+  color:var(--white);margin-bottom:1.5rem;
+}
+.f-group{margin-bottom:1.1rem}
+.f-group label{
+  display:block;font-family:var(--mono);font-size:.6rem;
+  letter-spacing:.15em;text-transform:uppercase;
+  color:var(--cyan);opacity:.7;margin-bottom:.5rem;
+}
+.f-group input,
+.f-group textarea,
+.f-group select{
+  width:100%;background:var(--surface);
+  border:1px solid var(--border);color:var(--white);
+  padding:.75rem 1rem;font-family:var(--sans);font-size:.88rem;
+  outline:none;transition:border-color .25s;
+  -webkit-appearance:none;
+}
+.f-group input:focus,.f-group textarea:focus,.f-group select:focus{border-color:var(--blue-lite)}
+.f-group textarea{height:110px;resize:vertical}
+.f-group select option{background:var(--surface)}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.btn-submit{
+  width:100%;background:var(--blue);color:#fff;
+  border:none;padding:1rem;cursor:pointer;
+  font-family:var(--sans);font-size:.82rem;font-weight:500;
+  letter-spacing:.1em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:.6rem;
+  transition:all .3s;
+}
+.btn-submit:hover{background:var(--blue-lite);box-shadow:0 4px 20px rgba(37,99,235,.4)}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer{
+  background:var(--bg);border-top:1px solid var(--border);
+  padding:3rem 2rem;
+}
+.footer-inner{
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;
+  gap:3rem;margin-bottom:2.5rem;
+}
+.footer-brand .nav-logo{margin-bottom:1rem;font-size:1rem}
+.footer-brand p{font-size:.8rem;line-height:1.7;opacity:.6;max-width:260px}
+.footer-col h4{
+  font-family:var(--mono);font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:1rem;opacity:.7;
+}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:.5rem}
+.footer-col ul a{font-size:.8rem;opacity:.5;transition:opacity .25s;color:var(--text2)}
+.footer-col ul a:hover{opacity:1;color:var(--blue-lite)}
+.footer-bottom{
+  border-top:1px solid var(--border2);padding-top:1.5rem;
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;max-width:1200px;margin:0 auto;
+}
+.footer-legal{
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.08em;
+  opacity:.35;line-height:1.8;
+}
+.footer-legal strong{color:var(--text2);opacity:.6}
+
+/* ============================================================
+   WHATSAPP FLOAT
+   ============================================================ */
+.wa-float{
+  position:fixed;bottom:1.8rem;right:1.8rem;z-index:800;
+  background:#22c55e;color:#fff;
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;
+  box-shadow:0 4px 24px rgba(34,197,94,.45);
+  transition:all .3s;
+}
+.wa-float:hover{transform:scale(1.12);box-shadow:0 8px 32px rgba(34,197,94,.55)}
+.wa-pulse{
+  position:absolute;width:100%;height:100%;border-radius:50%;
+  background:#22c55e;opacity:.4;
+  animation:pulse 2.5s ease-out infinite;
+}
+@keyframes pulse{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.8);opacity:0}}
+
+/* ============================================================
+   MOBILE NAV
+   ============================================================ */
+.mobile-menu{
+  display:none;position:fixed;top:64px;left:0;right:0;
+  background:rgba(8,12,18,.98);border-bottom:1px solid var(--border);
+  z-index:899;padding:1.5rem 2rem;
+  flex-direction:column;gap:1rem;
+}
+.mobile-menu a{
+  font-family:var(--sans);font-size:.9rem;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text2);padding:.5rem 0;border-bottom:1px solid var(--border2);
+}
+.mobile-menu.open{display:flex}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:900px){
+  .hero-inner{grid-template-columns:1fr;padding:3rem 2rem}
+  .hero-visual{display:none}
+  .about-inner{grid-template-columns:1fr;gap:2.5rem}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-inner{grid-template-columns:1fr 1fr;gap:2rem}
+  .services-grid{grid-template-columns:1fr}
+  .nav-links{display:none}
+  .nav-toggle{display:flex}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .stat-item:nth-child(2){border-right:none}
+  .stat-item:nth-child(3){border-right:1px solid var(--border)}
+  .stat-item:nth-child(4){border-right:none}
+  .f-row{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  section{padding:4rem 0}
+  .footer-inner{grid-template-columns:1fr}
+  .stats-inner{grid-template-columns:repeat(2,1fr)}
+  .products-grid{grid-template-columns:1fr 1fr}
+  .footer-bottom{flex-direction:column;text-align:center}
+}
+@media(max-width:420px){
+  .products-grid{grid-template-columns:1fr}
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.anim{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
+.anim.visible{opacity:1;transform:none}
+</style>
 </head>
 <body>
-    <nav>
-        <img src="logo.png" alt="Logo" style="height: 80px;">
-        <!-- Other navigation content -->
-    </nav>
-    <footer>
-        <img src="logo.png" alt="Logo" style="height: 60px;">
-        <!-- Footer content -->
-    </footer>
+
+<!-- ======================================================
+     NAV
+     ====================================================== -->
+<nav id="nav">
+  <a href="#hero" class="nav-logo">
+  <img src="logo.png" alt="RJM Import Export" style="height:40px;">
+</a>
+  <ul class="nav-links">
+    <li><a href="#productos">Productos</a></li>
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#sobre">Nosotros</a></li>
+    <li><a href="#contacto" class="nav-cta">Contactar</a></li>
+  </ul>
+  <div class="nav-toggle" onclick="toggleMenu()" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+<div class="mobile-menu" id="mobileMenu">
+  <a href="#productos" onclick="closeMenu()">Productos</a>
+  <a href="#servicios" onclick="closeMenu()">Servicios</a>
+  <a href="#sobre" onclick="closeMenu()">Nosotros</a>
+  <a href="#contacto" onclick="closeMenu()">Contactar</a>
+</div>
+
+<!-- ======================================================
+     HERO
+     ====================================================== -->
+<section id="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-eyebrow">RJM Import-Export EIRL · Ayacucho, Perú</div>
+      <h1 class="hero-title">
+        Tecnología al<br>servicio del<br><span class="hl">músico & luthier</span>
+      </h1>
+      <p class="hero-desc">
+        Importamos, comercializamos y desarrollamos accesorios de alta calidad para guitarra, componentes electrónicos y soluciones de fabricación digital. Desde Ayacucho para todo el Perú.
+      </p>
+      <div class="hero-actions">
+        <a href="https://wa.me/51956543522?text=Hola! Me interesa conocer sus productos" class="btn btn-primary" target="_blank">
+          💬 Escribir por WhatsApp
+        </a>
+        <a href="#productos" class="btn btn-ghost">Ver Catálogo →</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-main">
+        <div class="hero-card-label">// Estado operacional</div>
+        <div class="hero-metrics">
+          <div class="metric">
+            <span class="metric-val">300+</span>
+            <span class="metric-label">Productos</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">4</span>
+            <span class="metric-label">Categorías</span>
+          </div>
+          <div class="metric">
+            <span class="metric-val">100%</span>
+            <span class="metric-label">Garantía</span>
+          </div>
+        </div>
+        <div class="hero-badges">
+          <div class="badge active">Importación activa</div>
+          <div class="badge active">Envíos nacionales</div>
+          <div class="badge">Fabricación 3D</div>
+          <div class="badge">Electrónica custom</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <div class="stat-n">300+</div>
+      <div class="stat-l">SKUs en catálogo</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-n">Todo Perú</div>
+      <div class="stat-l">Cobertura de envío</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-n">4</div>
+      <div class="stat-l">Líneas de producto</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-n">24h</div>
+      <div class="stat-l">Respuesta WhatsApp</div>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================
+     PRODUCTOS
+     ====================================================== -->
+<section id="productos">
+  <div class="container">
+    <div class="products-header anim">
+      <div class="tag">Catálogo completo</div>
+      <h2 class="section-title">Nuestros Productos</h2>
+      <p class="section-sub">Accesorios, componentes y materiales seleccionados para músicos, técnicos y luthiers exigentes.</p>
+    </div>
+
+    <!-- ACCESORIOS -->
+    <div class="cat-section anim">
+      <div class="cat-section-title">🎸 Accesorios para Guitarra</div>
+      <div class="products-grid">
+
+        <div class="product-card">
+          <div class="product-img">
+            <img src="https://images.unsplash.com/photo-1510915361894-db8b60106cb1?w=400&q=75&fit=crop" alt="Cuerdas guitarra" loading="lazy" onerror="this.parentNode.innerHTML='<div class=product-img-ph>🪢<span>Cuerdas</span></div>'"/>
+            <span class="product-badge">Más vendido</span>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Cuerdas</div>
+            <div class="product-name">Cuerdas para Guitarra</div>
+            <div class="product-desc">Acústica, eléctrica y clásica. Nylon y acero, varias marcas y calibres disponibles.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Cuerdas para guitarra" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=75&fit=crop" alt="Clavijeros" loading="lazy" onerror="this.parentNode.innerHTML='<div class=product-img-ph>🔩<span>Clavijeros</span></div>'"/>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Mecánica</div>
+            <div class="product-name">Clavijeros</div>
+            <div class="product-desc">Clavijeros estándar y premium para guitarra acústica, eléctrica y clásica. 3+3 y 6 en línea.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Clavijeros" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <img src="https://images.unsplash.com/photo-1550537780-3d5c90e33bc7?w=400&q=75&fit=crop" alt="Afinador digital" loading="lazy" onerror="this.parentNode.innerHTML='<div class=product-img-ph>🎵<span>Afinadores</span></div>'"/>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Electrónica</div>
+            <div class="product-name">Afinadores Digitales</div>
+            <div class="product-desc">Clip-on, cromáticos y piecé para diferentes instrumentos. Precisión profesional.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Afinadores digitales" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <img src="https://images.unsplash.com/photo-1516924962500-2b4b3b99ea02?w=400&q=75&fit=crop" alt="Correas guitarra" loading="lazy" onerror="this.parentNode.innerHTML='<div class=product-img-ph>🎒<span>Correas</span></div>'"/>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Accesorios</div>
+            <div class="product-name">Correas para Guitarra</div>
+            <div class="product-desc">Cuero, nylon y tejido. Ajustables, con sistema de seguridad. Varios diseños.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Correas" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <img src="https://images.unsplash.com/photo-1564186763535-ebb21ef5277f?w=400&q=75&fit=crop" alt="Cables audio" loading="lazy" onerror="this.parentNode.innerHTML='<div class=product-img-ph>🔌<span>Cables</span></div>'"/>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Audio</div>
+            <div class="product-name">Cables de Audio</div>
+            <div class="product-desc">Instrumento y patch. Jack 6.3mm TS/TRS, XLR, varios metrajes. Blindaje profesional.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Cables de audio" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🎼<span>Capos</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Accesorios</div>
+            <div class="product-name">Capos / Cejillas</div>
+            <div class="product-desc">Para guitarra acústica y eléctrica. Modelos de palanca, tornillo y clips. Cromados y negros.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Capos" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🔧<span>Puentes</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Luthería</div>
+            <div class="product-name">Puentes, Selletas & Pines</div>
+            <div class="product-desc">Puentes para acústica y clásica, selletas de hueso y plástico, pines de varias maderas.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Puentes y selletas" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🛡️<span>Pickguards</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Accesorios</div>
+            <div class="product-name">Pickguards</div>
+            <div class="product-desc">Guardas para guitarra acústica y eléctrica. Tortoise, negro, blanco, perlado.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Pickguards" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🎛️<span>Knobs</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Hardware</div>
+            <div class="product-name">Perillas (Knobs)</div>
+            <div class="product-desc">Para potenciómetros de guitarra eléctrica y bajo. Metal, plástico, varios diámetros.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Knobs/Perillas" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🔌<span>Jacks</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Electrónica</div>
+            <div class="product-name">Jack & Conectores</div>
+            <div class="product-desc">Input jack mono y estéreo, conectores TRS, mini jack, RCA. Para instrumentos y amplificadores.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Jacks y conectores" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ELECTRÓNICA -->
+    <div class="cat-section anim">
+      <div class="cat-section-title">⚡ Componentes Electrónicos</div>
+      <div class="products-grid">
+
+        <div class="product-card">
+          <div class="product-img">
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&q=75&fit=crop" alt="Preamplificador" loading="lazy" onerror="this.parentNode.innerHTML='<div class=product-img-ph>🎛️<span>Preamp</span></div>'"/>
+            <span class="product-badge">Top</span>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Amplificación</div>
+            <div class="product-name">Preamplificadores</div>
+            <div class="product-desc">Preamp para guitarra acústica con EQ integrado. Con y sin afinador incorporado.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Preamplificadores" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🎸<span>Piezo</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Transductores</div>
+            <div class="product-name">Pastillas Piezoeléctrica</div>
+            <div class="product-desc">Pastillas piezo de contacto y bajo el puente. Para guitarra, ukulele, charango y más.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Pastillas piezoeléctricas" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🎤<span>Micrófono</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Captación</div>
+            <div class="product-name">Micrófonos para Guitarra</div>
+            <div class="product-desc">Micrófonos de boca, soundhole y condensadores para guitarra acústica. Alta fidelidad.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Micrófonos para guitarra" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🎚️<span>EQ</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Control de tono</div>
+            <div class="product-name">Ecualizadores</div>
+            <div class="product-desc">EQ de 3, 5 y 7 bandas para guitarra acústica. Con afinador y control de volumen.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Ecualizadores" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🔄<span>Potenciómetros</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Componentes</div>
+            <div class="product-name">Potenciómetros</div>
+            <div class="product-desc">Pots de 250K, 500K y 1M. Alpha y otros, lineal y logarítmico. Para guitarra y bajo.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Potenciómetros" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">⚙️<span>Switches</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Conmutación</div>
+            <div class="product-name">Switches</div>
+            <div class="product-desc">Selectores de pastilla 3 y 5 posiciones, toggle switches DPDT y mini switches.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Switches" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🖥️<span>PCB</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Electrónica</div>
+            <div class="product-name">Placas Electrónicas</div>
+            <div class="product-desc">Placas PCB prearmadas para proyectos de guitarra, efectos y electrónica de instrumento.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Placas electrónicas" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- LUTHERÍA -->
+    <div class="cat-section anim">
+      <div class="cat-section-title">🪵 Materiales de Luthiería</div>
+      <div class="products-grid">
+
+        <div class="product-card">
+          <div class="product-img">
+            <img src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&q=75&fit=crop" alt="Maderas" loading="lazy" onerror="this.parentNode.innerHTML='<div class=product-img-ph>🪵<span>Maderas</span></div>'"/>
+            <span class="product-badge">Especialidad</span>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Materiales</div>
+            <div class="product-name">Maderas para Instrumentos</div>
+            <div class="product-desc">Tapas, fondos, aros y mástiles. Abeto, cedro, caoba y maderas locales peruanas.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Maderas para luthiería" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">📏<span>Trastes</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Hardware</div>
+            <div class="product-name">Trastes</div>
+            <div class="product-desc">Fretwire de níquel-plata en varios anchos y alturas. Por metro o tira completa.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Trastes" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🦴<span>Cejuelas</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Luthería</div>
+            <div class="product-name">Cejuelas & Huesos</div>
+            <div class="product-desc">Cejuelas de hueso, TUSQ y plástico. Preformadas y en blanco para tallar.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Cejuelas y huesos" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🔨<span>Herramientas</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Herramientas</div>
+            <div class="product-name">Herramientas de Luthier</div>
+            <div class="product-desc">Gubias, rasquetas, calibradores, curvímetros, prensas y kits especializados.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Herramientas de luthier" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <div class="product-img">
+            <div class="product-img-ph">🧪<span>Adhesivos</span></div>
+          </div>
+          <div class="product-info">
+            <div class="product-cat">Pegamentos</div>
+            <div class="product-name">Adhesivos Especiales</div>
+            <div class="product-desc">Cola de carpintero, hide glue, cianoacrilato y otros adhesivos para luthería.</div>
+            <a href="https://wa.me/51956543522?text=Hola! Consulto por Adhesivos" class="product-action" target="_blank">Consultar →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ======================================================
+     SERVICIOS
+     ====================================================== -->
+<section id="servicios">
+  <div class="container">
+    <div class="anim">
+      <div class="tag">Servicios tecnológicos</div>
+      <h2 class="section-title">Fabricación &amp; Desarrollo Digital</h2>
+      <p class="section-sub">Desarrollamos soluciones a medida para luthiers, fabricantes y músicos que necesitan ir más allá del producto estándar.</p>
+    </div>
+    <div class="services-grid">
+
+      <div class="service-card anim">
+        <div class="service-icon">🖥️</div>
+        <div class="service-name">Diseño 3D para CNC</div>
+        <div class="service-desc">Diseño de piezas y componentes para guitarra optimizados para fresado CNC. Plantillas, cuerpos, mástiles y más.</div>
+        <ul class="service-features">
+          <li>Modelos listos para CNC (DXF, SVG, G-Code)</li>
+          <li>Cuerpos y mástiles de guitarra</li>
+          <li>Plantillas y jigs de luthería</li>
+          <li>Revisiones incluidas hasta aprobación</li>
+        </ul>
+      </div>
+
+      <div class="service-card anim">
+        <div class="service-icon">📐</div>
+        <div class="service-name">Modelado 3D</div>
+        <div class="service-desc">Modelado de precisión en software profesional. Desde referencias o medidas, creamos tu pieza en 3D lista para producción.</div>
+        <ul class="service-features">
+          <li>Formatos: STL, STEP, OBJ, FBX</li>
+          <li>Modelado orgánico e industrial</li>
+          <li>Renderizado fotorrealista opcional</li>
+          <li>Entrega en 3–7 días hábiles</li>
+        </ul>
+      </div>
+
+      <div class="service-card anim">
+        <div class="service-icon">🖨️</div>
+        <div class="service-name">Impresión 3D</div>
+        <div class="service-desc">Impresión de prototipos y piezas funcionales. PLA, PETG y materiales flexibles. Ideal para probar diseños antes de producción.</div>
+        <ul class="service-features">
+          <li>PLA, PETG, TPU flexible</li>
+          <li>Piezas hasta 25×25×25 cm</li>
+          <li>Acabado liso post-proceso</li>
+          <li>Envío a todo el Perú</li>
+        </ul>
+      </div>
+
+      <div class="service-card anim">
+        <div class="service-icon">⚡</div>
+        <div class="service-name">Desarrollo Electrónico</div>
+        <div class="service-desc">Diseño y fabricación de circuitos personalizados para instrumento. Preamplificadores, efectos y sistemas de captación a medida.</div>
+        <ul class="service-features">
+          <li>Diseño de PCB personalizado</li>
+          <li>Preamplificadores activos custom</li>
+          <li>Sistemas de captación híbridos</li>
+          <li>Prototipo + producción en serie</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     SOBRE NOSOTROS
+     ====================================================== -->
+<section id="sobre">
+  <div class="container">
+    <div class="about-inner">
+      <div class="about-visual anim">
+        <div class="about-accent2"></div>
+        <div class="about-main-card">
+          <img
+            src="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&q=75&fit=crop"
+            alt="Taller de guitarras"
+            class="about-img"
+            loading="lazy"
+            onerror="this.outerHTML='<div class=about-img-ph>🎸</div>'"
+          />
+          <div class="about-card-footer">
+            <div>
+              <div class="about-card-footer-label">Ubicación</div>
+              <div class="about-card-footer-val">Ayacucho, Perú 🇵🇪</div>
+            </div>
+            <div>
+              <div class="about-card-footer-label">Web</div>
+              <div class="about-card-footer-val">rjmimport.com</div>
+            </div>
+          </div>
+        </div>
+        <div class="about-accent"></div>
+      </div>
+      <div class="about-content anim">
+        <div class="tag">Sobre la empresa</div>
+        <h2 class="section-title">RJM Import-Export EIRL</h2>
+        <p class="section-sub">
+          Empresa peruana especializada en la importación, comercialización y desarrollo de productos para guitarra, luthiers y fabricación digital. Conectamos a músicos y artesanos con tecnología de calidad.
+        </p>
+        <div class="about-values">
+          <div class="about-val">
+            <div class="about-val-icon">◈</div>
+            <div class="about-val-text">
+              <strong>Importación directa</strong>
+              <p>Trabajamos con proveedores internacionales para traer productos de calidad a precios competitivos en el mercado peruano.</p>
+            </div>
+          </div>
+          <div class="about-val">
+            <div class="about-val-icon">◈</div>
+            <div class="about-val-text">
+              <strong>Soporte técnico especializado</strong>
+              <p>Nuestro equipo conoce los productos que vendemos. Te asesoramos para que elijas lo correcto para tu proyecto.</p>
+            </div>
+          </div>
+          <div class="about-val">
+            <div class="about-val-icon">◈</div>
+            <div class="about-val-text">
+              <strong>Envíos a todo el Perú</strong>
+              <p>Despachamos por empresas de transporte reconocidas. Empaque seguro y seguimiento de tu pedido.</p>
+            </div>
+          </div>
+          <div class="about-val">
+            <div class="about-val-icon">◈</div>
+            <div class="about-val-text">
+              <strong>Fabricación digital a medida</strong>
+              <p>No solo importamos: desarrollamos. Si necesitas una pieza que no existe en el mercado, la creamos para ti.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     CONTACTO
+     ====================================================== -->
+<section id="contacto">
+  <div class="container">
+    <div class="anim">
+      <div class="tag">Contacto directo</div>
+      <h2 class="section-title">Habla con nosotros</h2>
+      <p class="section-sub">¿Tienes una consulta, necesitas cotización o quieres un producto en específico? Escríbenos.</p>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info anim">
+        <div class="contact-item">
+          <div class="contact-ico">📲</div>
+          <div>
+            <div class="contact-label">WhatsApp</div>
+            <div class="contact-val">
+              <a href="https://wa.me/51956543522" target="_blank">+51 956 543 522</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-ico">✉️</div>
+          <div>
+            <div class="contact-label">Correo electrónico</div>
+            <div class="contact-val">
+              <a href="mailto:rjm.import.export@gmail.com">rjm.import.export@gmail.com</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-ico">🌐</div>
+          <div>
+            <div class="contact-label">Sitio web</div>
+            <div class="contact-val">
+              <a href="https://www.rjmimport.com/" target="_blank">www.rjmimport.com</a>
+            </div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-ico">📍</div>
+          <div>
+            <div class="contact-label">Ubicación</div>
+            <div class="contact-val">Ayacucho, Perú</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-ico">📦</div>
+          <div>
+            <div class="contact-label">Envíos</div>
+            <div class="contact-val">Todo el Perú · Shalom · Olva · otros</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-ico">🕐</div>
+          <div>
+            <div class="contact-label">Atención</div>
+            <div class="contact-val">Lun–Sáb: 9:00 am – 7:00 pm</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-form anim">
+        <div class="form-title">Enviar consulta →</div>
+        <form onsubmit="enviarConsulta(event)">
+          <div class="f-row">
+            <div class="f-group">
+              <label>Nombre completo</label>
+              <input type="text" id="c-nombre" placeholder="Tu nombre" required/>
+            </div>
+            <div class="f-group">
+              <label>Teléfono / WhatsApp</label>
+              <input type="tel" id="c-tel" placeholder="+51 999 999 999"/>
+            </div>
+          </div>
+          <div class="f-group">
+            <label>Categoría de interés</label>
+            <select id="c-cat">
+              <option value="">Selecciona una categoría</option>
+              <option>Accesorios para guitarra</option>
+              <option>Componentes electrónicos</option>
+              <option>Materiales de luthiería</option>
+              <option>Diseño 3D / CNC</option>
+              <option>Impresión 3D</option>
+              <option>Desarrollo electrónico</option>
+              <option>Otro</option>
+            </select>
+          </div>
+          <div class="f-group">
+            <label>Producto o consulta específica</label>
+            <input type="text" id="c-prod" placeholder="Ej: Preamplificador con EQ 5 bandas"/>
+          </div>
+          <div class="f-group">
+            <label>Mensaje</label>
+            <textarea id="c-msg" placeholder="Cuéntanos qué necesitas, cantidad aproximada, presupuesto, etc."></textarea>
+          </div>
+          <button type="submit" class="btn-submit">
+            <span>💬</span> Enviar por WhatsApp
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ======================================================
+     FOOTER
+     ====================================================== -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="nav-logo">RJM <span class="nav-logo-badge">IMPORT</span></div>
+      <p>Importación, comercialización y desarrollo de productos para guitarra, luthiers y fabricación digital. Desde Ayacucho para todo el Perú.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Productos</h4>
+      <ul>
+        <li><a href="#productos">Accesorios Guitarra</a></li>
+        <li><a href="#productos">Electrónica</a></li>
+        <li><a href="#productos">Luthiería</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Servicios</h4>
+      <ul>
+        <li><a href="#servicios">Diseño 3D / CNC</a></li>
+        <li><a href="#servicios">Modelado 3D</a></li>
+        <li><a href="#servicios">Impresión 3D</a></li>
+        <li><a href="#servicios">Desarrollo Electrónico</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contacto</h4>
+      <ul>
+        <li><a href="https://wa.me/51956543522" target="_blank">WhatsApp</a></li>
+        <li><a href="mailto:rjm.import.export@gmail.com">Email</a></li>
+        <li><a href="https://www.rjmimport.com/" target="_blank">Web oficial</a></li>
+        <li><a href="#sobre">Sobre nosotros</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-legal">
+      <strong>RJM Import-Export EIRL</strong> · Ayacucho, Perú<br>
+      Importación y servicios tecnológicos · <a href="https://www.rjmimport.com/" style="color:inherit;opacity:.5">www.rjmimport.com</a><br>
+      rjm.import.export@gmail.com · +51 956 543 522
+    </div>
+    <div class="footer-legal" style="text-align:right">
+      © 2025 RJM Import-Export EIRL<br>
+      Todos los derechos reservados
+    </div>
+  </div>
+</footer>
+
+<!-- WhatsApp flotante -->
+<a href="https://wa.me/51956543522?text=Hola! Me interesa conocer sus productos y servicios" class="wa-float" target="_blank" title="Escribir por WhatsApp">
+  <span class="wa-pulse"></span>
+  💬
+</a>
+
+<!-- ======================================================
+     SCRIPTS
+     ====================================================== -->
+<script>
+// Mobile menu
+function toggleMenu(){
+  document.getElementById('mobileMenu').classList.toggle('open');
+}
+function closeMenu(){
+  document.getElementById('mobileMenu').classList.remove('open');
+}
+
+// Form → WhatsApp
+function enviarConsulta(e){
+  e.preventDefault();
+  const n  = document.getElementById('c-nombre').value.trim();
+  const t  = document.getElementById('c-tel').value.trim();
+  const c  = document.getElementById('c-cat').value;
+  const p  = document.getElementById('c-prod').value.trim();
+  const m  = document.getElementById('c-msg').value.trim();
+
+  let msg = `Hola RJM! Mi nombre es *${n || 'cliente'}*.`;
+  if(t)  msg += `\n📞 Tel: ${t}`;
+  if(c)  msg += `\n📦 Categoría: ${c}`;
+  if(p)  msg += `\n🎸 Producto: ${p}`;
+  if(m)  msg += `\n\n${m}`;
+
+  window.open(`https://wa.me/51956543522?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// Scroll animations
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('visible'); observer.unobserve(e.target); }
+  });
+},{threshold:0.08});
+document.querySelectorAll('.anim').forEach(el=>observer.observe(el));
+
+// Nav shrink on scroll
+window.addEventListener('scroll',()=>{
+  const nav = document.getElementById('nav');
+  nav.style.height = window.scrollY > 60 ? '56px' : '64px';
+});
+</script>
 </body>
 </html>
