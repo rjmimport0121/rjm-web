@@ -1,5 +1,8 @@
 # Archivos que Cloudflare no debe publicar como parte de la web
+.git
+.assetsignore
+wrangler.jsonc
 supabase
 docs
 README.md
-.git
+.wrangler
