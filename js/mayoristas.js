@@ -106,7 +106,8 @@
   // ---------- Proforma (precios con IGV incluido) ----------
   const EMPRESA = {
     nombre: 'RJM Import-Export E.I.R.L.',
-    lineas: ['Ayacucho, Perú', 'WhatsApp: +51 956 543 522', 'rjm.import.export@gmail.com', 'www.rjmimport.com'],
+    ruc: '20610045171',
+    lineas: ['RUC 20610045171', 'Asoc. Basilio Auqui Mz. G Lt. 6, Ayacucho, Perú', 'WhatsApp: +51 956 543 522', 'rjm.import.export@gmail.com', 'www.rjmimport.com'],
   };
 
   function datosProforma() {
@@ -127,7 +128,7 @@
 
   function textoProforma(d) {
     const linea = '------------------------------';
-    let t = `*PROFORMA N° ${d.numero}*\n${EMPRESA.nombre}\nFecha: ${d.fecha}\n${linea}\n`;
+    let t = `*PROFORMA N° ${d.numero}*\n${EMPRESA.nombre}\nRUC ${EMPRESA.ruc}\nFecha: ${d.fecha}\n${linea}\n`;
     t += `*Cliente:* ${perfil.nombre || perfil.usuario}\n`;
     if (perfil.ruc) t += `*RUC/DNI:* ${perfil.ruc}\n`;
     if (perfil.telefono) t += `*Teléfono:* ${perfil.telefono}\n`;
@@ -190,7 +191,7 @@
     doc.text('Fecha: ' + d.fecha, ancho - m - 31, 32, { align: 'center' });
 
     // Cliente
-    let y = 46;
+    let y = 50;
     doc.setFillColor(243, 246, 251); doc.rect(m, y - 5, ancho - 2 * m, 20, 'F');
     doc.setTextColor(20); doc.setFontSize(9.5);
     const filaCli = (et, val, x, yy) => { doc.setFont('helvetica', 'bold'); doc.text(et, x, yy); doc.setFont('helvetica', 'normal'); doc.text(String(val || '—'), x + 22, yy); };
