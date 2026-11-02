@@ -1,0 +1,8 @@
+// Configuración de Cloudflare Workers: la web es 100 % estática (sin código de servidor).
+{
+  "name": "rjm-web",
+  "compatibility_date": "2026-05-01",
+  "assets": {
+    "directory": "./"
+  }
+}

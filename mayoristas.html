@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Portal mayorista | RJM Import-Export</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/panel.css"/>
+<style>
+  .tramos-txt{font-size:.8rem;line-height:1.7;white-space:nowrap}
+  .tramos-txt b{color:var(--white);font-weight:500}
+  .cant{width:90px;text-align:right}
+  .resumen{position:sticky;bottom:0;background:var(--panel);border:1px solid var(--border);padding:1rem;margin-top:1rem;
+    display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
+  .resumen .total{font-family:var(--display);font-size:1.2rem;color:var(--white)}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="marca" href="index.html"><img src="logo.png" alt="RJM"/><span>RJM <small>Portal mayorista</small></span></a>
+  <div class="acciones">
+    <span id="quien"></span>
+    <button class="btn sec chico oculto" id="btnSalir">Cerrar sesión</button>
+  </div>
+</header>
+
+<main id="vistaLogin" class="wrap">
+  <div class="card login">
+    <h1>Portal mayorista</h1>
+    <p class="sub">Ingresa con el usuario y la contraseña que te entregó RJM.</p>
+    <div id="loginMsg"></div>
+    <form id="formLogin">
+      <div class="campo"><label for="lUsuario">Usuario</label><input id="lUsuario" autocomplete="username" autocapitalize="none" required/></div>
+      <div class="campo"><label for="lClave">Contraseña</label><input id="lClave" type="password" autocomplete="current-password" required/></div>
+      <button class="btn full" id="btnEntrar">Ingresar</button>
+    </form>
+    <p class="sub" style="margin:1.2rem 0 0;font-size:.8rem">¿Quieres ser distribuidor? <a id="linkWa" target="_blank" rel="noopener">Escríbenos por WhatsApp</a></p>
+  </div>
+</main>
+
+<main id="vistaLista" class="wrap oculto">
+  <h1>Lista de precios mayoristas</h1>
+  <p class="sub" id="saludo"></p>
+  <div id="listaMsg"></div>
+  <div class="barra">
+    <input type="search" id="buscar" placeholder="Buscar por nombre, código o categoría…"/>
+    <small id="actualizado"></small>
+  </div>
+  <div class="tabla-wrap"><table>
+    <thead><tr><th>Código</th><th>Producto</th><th class="num">Stock</th><th>Precio unitario según cantidad</th><th class="num">Cantidad</th><th class="num">Subtotal</th></tr></thead>
+    <tbody id="tbLista"><tr><td colspan="6">Cargando…</td></tr></tbody>
+  </table></div>
+  <div class="resumen">
+    <div><small>Total estimado</small><div class="total" id="total">S/ 0.00</div><small id="notaIgv"></small></div>
+    <button class="btn" id="btnPedido" disabled>Enviar pedido por WhatsApp</button>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/comun.js"></script>
+<script src="js/mayoristas.js"></script>
+</body>
+</html>
