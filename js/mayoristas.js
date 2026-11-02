@@ -11,6 +11,12 @@
     $(el).innerHTML = texto ? `<div class="msg ${tipo}">${esc(texto)}</div>` : '';
   }
 
+  // El portal es solo para clientes mayoristas; el administrador usa admin.html.
+  function motivoRechazo(p) {
+    if (p && p.rol === 'admin') return 'Esa es la cuenta de administrador. Este portal es para tus clientes: ingresa con un usuario mayorista (por ejemplo, el de prueba). Para publicar productos y precios usa el panel de administración.';
+    return 'Tu acceso está desactivado. Comunícate con RJM.';
+  }
+
   async function iniciar() {
     if (!RJM.configurado) {
       aviso('loginMsg', 'El portal aún no está configurado.', 'info');
@@ -18,8 +24,8 @@
       return;
     }
     const p = await RJM.perfilActual();
-    if (p && p.activo) return mostrar(p);
-    if (p) { await sb.auth.signOut(); aviso('loginMsg', 'Tu acceso está desactivado. Comunícate con RJM.'); }
+    if (p && p.activo && p.rol === 'mayorista') return mostrar(p);
+    if (p) { await RJM.salir(); aviso('loginMsg', motivoRechazo(p), p.rol === 'admin' ? 'info' : 'err'); }
   }
 
   $('formLogin').addEventListener('submit', async e => {
@@ -29,12 +35,15 @@
     $('btnEntrar').disabled = false;
     if (error) return aviso('loginMsg', RJM.errorLegible(error));
     const p = await RJM.perfilActual();
-    if (!p || !p.activo) { await sb.auth.signOut(); return aviso('loginMsg', 'Tu acceso está desactivado. Comunícate con RJM.'); }
+    if (!p || !p.activo || p.rol !== 'mayorista') {
+      await RJM.salir();
+      return aviso('loginMsg', motivoRechazo(p), p && p.rol === 'admin' ? 'info' : 'err');
+    }
     $('lClave').value = '';
     mostrar(p);
   });
 
-  $('btnSalir').addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
+  $('btnSalir').addEventListener('click', async () => { await RJM.salir(); location.reload(); });
 
   async function mostrar(p) {
     perfil = p;

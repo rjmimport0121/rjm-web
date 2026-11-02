@@ -53,7 +53,7 @@
     }
     const perfil = await RJM.perfilActual();
     if (perfil && perfil.rol === 'admin' && perfil.activo) return mostrarPanel(perfil);
-    if (perfil) { await sb.auth.signOut(); aviso('loginMsg', 'Esta cuenta no tiene permisos de administrador.'); }
+    if (perfil) { await RJM.salir(); aviso('loginMsg', 'Esta cuenta no tiene permisos de administrador.'); }
   }
 
   $('formLogin').addEventListener('submit', async e => {
@@ -64,14 +64,14 @@
     if (error) return aviso('loginMsg', RJM.errorLegible(error));
     const perfil = await RJM.perfilActual();
     if (!perfil || perfil.rol !== 'admin' || !perfil.activo) {
-      await sb.auth.signOut();
+      await RJM.salir();
       return aviso('loginMsg', 'Esta cuenta no tiene permisos de administrador.');
     }
     $('lClave').value = '';
     mostrarPanel(perfil);
   });
 
-  $('btnSalir').addEventListener('click', async () => { await sb.auth.signOut(); location.reload(); });
+  $('btnSalir').addEventListener('click', async () => { await RJM.salir(); location.reload(); });
 
   function mostrarPanel(perfil) {
     $('vistaLogin').classList.add('oculto');

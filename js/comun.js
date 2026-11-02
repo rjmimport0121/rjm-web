@@ -3,10 +3,22 @@
   const cfg = window.RJM_CONFIG || {};
   const listo = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase);
 
+  // Cada área guarda su propia sesión: entrar al panel de administración NO abre
+  // el portal de clientes (y al revés). La web pública no usa sesión.
+  const ruta = location.pathname.toLowerCase();
+  const area = ruta.includes('admin') ? 'admin' : ruta.includes('mayorista') ? 'portal' : 'web';
+  const opciones = { auth: { storageKey: 'rjm-sesion-' + area, persistSession: area !== 'web', autoRefreshToken: area !== 'web' } };
+  // Limpia la sesión antigua, que antes compartían el panel y el portal.
+  try { localStorage.removeItem('sb-' + new URL(cfg.SUPABASE_URL).hostname.split('.')[0] + '-auth-token'); } catch (_) {}
+
   window.RJM = {
     cfg,
     configurado: listo,
-    sb: listo ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY) : null,
+    area,
+    sb: listo ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, opciones) : null,
+
+    // Cierra la sesión solo en esta área y en este navegador.
+    async salir() { if (this.sb) await this.sb.auth.signOut({ scope: 'local' }); },
 
     esc(v) {
       return String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
