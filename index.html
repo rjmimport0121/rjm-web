@@ -504,6 +504,12 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
 .product-action.wa{background:#22c55e;border-color:#22c55e;color:#fff}
 .product-action.wa:hover{background:#16a34a;border-color:#16a34a}
 .product-card[data-id]{cursor:pointer}
+.ver-sub{display:block;width:100%;margin-top:.6rem;cursor:pointer;font-family:inherit;background:var(--blue);color:#fff;border-color:var(--blue)}
+.ver-sub:hover{background:var(--blue-lite)}
+.lmodal-fondo{position:fixed;inset:0;z-index:940;background:rgba(0,0,0,.75);display:none;align-items:flex-start;justify-content:center;padding:5vh 1rem;overflow-y:auto}
+.lmodal-fondo.abierto{display:flex}
+.lmodal{background:var(--surface);border:1px solid var(--border);max-width:1100px;width:100%;padding:1.5rem;position:relative}
+.lmodal h3{font-family:var(--display);font-size:1.4rem;color:var(--white);margin:.2rem 2.5rem 1.2rem 0}
 .pmodal-fondo{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.75);display:none;align-items:flex-start;justify-content:center;padding:5vh 1rem;overflow-y:auto}
 .pmodal-fondo.abierto{display:flex}
 .pmodal{background:var(--panel);border:1px solid var(--border);max-width:880px;width:100%;display:grid;grid-template-columns:1fr 1fr;position:relative}
@@ -661,8 +667,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
 
     <!-- CATÁLOGO CON PRECIOS (se llena desde admin.html; oculto si no hay productos) -->
     <div class="cat-section" id="catalogoDinamico" hidden>
-      <div class="cat-section-title">🛒 Productos disponibles</div>
-      <div class="dyn-filtros" id="dynFiltros"></div>
+      <div class="cat-section-title">⭐ Destacados y novedades</div>
       <div class="products-grid" id="dynGrid"></div>
     </div>
 
@@ -1243,6 +1248,16 @@ function enviarConsulta(e) {
   window.open(`https://wa.me/51956543522?text=${encodeURIComponent(msg)}`, '_blank');
 }
 </script>
+
+<!-- Lista de productos de un subgrupo -->
+<div class="lmodal-fondo" id="lmodal" role="dialog" aria-modal="true" aria-labelledby="lmTitulo">
+  <div class="lmodal">
+    <button class="pmodal-cerrar" id="lmCerrar" aria-label="Cerrar">✕</button>
+    <div class="product-cat" id="lmGrupo"></div>
+    <h3 id="lmTitulo"></h3>
+    <div class="products-grid" id="lmGrid"></div>
+  </div>
+</div>
 
 <!-- Ficha de producto -->
 <div class="pmodal-fondo" id="pmodal" role="dialog" aria-modal="true" aria-labelledby="pmTitulo">

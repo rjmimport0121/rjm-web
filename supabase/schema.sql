@@ -64,7 +64,7 @@ create table if not exists public.productos (
   id              uuid primary key default gen_random_uuid(),
   sku             text unique,
   nombre          text not null,
-  categoria       text not null default 'Accesorios',
+  categoria       text not null default 'Accesorios', -- subgrupo (p. ej. Preamplificadores)
   marca           text,
   descripcion     text,
   caracteristicas text[] not null default '{}',   -- una característica por línea
@@ -109,6 +109,10 @@ create table if not exists public.precios_mayoristas (
   unique (producto_id, cantidad_minima)
 );
 create index if not exists precios_mayoristas_producto_idx on public.precios_mayoristas(producto_id);
+
+-- Grupo del catálogo (Accesorios para Guitarra, Componentes Electrónicos, ...)
+alter table public.productos            add column if not exists grupo text;
+alter table public.productos_mayoristas add column if not exists grupo text;
 
 -- ------------------------------------------------------------
 -- 4. FECHA DE ACTUALIZACIÓN AUTOMÁTICA

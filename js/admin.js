@@ -10,6 +10,40 @@
   }
   function ocupado(btn, si) { $(btn).disabled = si; }
 
+  // ---------------- GRUPO / SUBGRUPO ----------------
+  const CATS = window.RJM_CATEGORIAS || [];
+  const OTRO = '__otro__';
+  const igual = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+  function grupoDe(sub) { return (CATS.find(c => c.subgrupos.some(x => igual(x, sub))) || {}).grupo || null; }
+  function selectorCategoria(idGrupo, idSub, idOtro, opcional) {
+    const g = $(idGrupo), sub = $(idSub), otro = $(idOtro);
+    g.innerHTML = (opcional ? '<option value="">— Sin grupo —</option>' : '<option value="" disabled>Elige un grupo…</option>') +
+      CATS.map(c => `<option>${esc(c.grupo)}</option>`).join('');
+    function llenarSub(valor) {
+      const c = CATS.find(x => x.grupo === g.value);
+      const lista = c ? c.subgrupos : [];
+      valor = lista.find(x => igual(x, valor)) || valor;
+      const esOtro = valor && !lista.includes(valor);
+      sub.innerHTML = (opcional ? '<option value="">— Sin subgrupo —</option>' : '<option value="" disabled>Elige un subgrupo…</option>') +
+        lista.map(x => `<option>${esc(x)}</option>`).join('') + `<option value="${OTRO}">Otro… (escribir)</option>`;
+      sub.value = esOtro ? OTRO : (valor || '');
+      otro.value = esOtro ? valor : '';
+      otro.classList.toggle('oculto', !esOtro);
+      otro.required = esOtro;
+    }
+    g.addEventListener('change', () => llenarSub(''));
+    sub.addEventListener('change', () => { otro.classList.toggle('oculto', sub.value !== OTRO); otro.required = sub.value === OTRO; if (sub.value === OTRO) otro.focus(); });
+    return {
+      poner(grupo, subgrupo) { g.value = grupo || grupoDe(subgrupo) || ''; llenarSub(subgrupo || ''); },
+      leer() {
+        const s2 = sub.value === OTRO ? otro.value.trim() : sub.value;
+        return { grupo: g.value || null, categoria: s2 || null };
+      },
+    };
+  }
+  const selProd = selectorCategoria('pGrupo', 'pSubgrupo', 'pSubOtro', false);
+  const selMay = selectorCategoria('mGrupo', 'mCategoria', 'mSubOtro', true);
+
   // ---------------- SESIÓN ----------------
   async function iniciar() {
     if (!RJM.configurado) {
@@ -63,12 +97,12 @@
   }
   function pintarCatalogo() {
     const q = $('buscarCat').value.trim().toLowerCase();
-    const filas = productos.filter(p => !q || `${p.nombre} ${p.sku || ''} ${p.categoria}`.toLowerCase().includes(q));
+    const filas = productos.filter(p => !q || `${p.nombre} ${p.sku || ''} ${p.grupo || ''} ${p.categoria}`.toLowerCase().includes(q));
     $('tbCatalogo').innerHTML = filas.length ? filas.map(p => `
       <tr>
         <td>${p.foto_url ? `<img class="mini" src="${esc(p.foto_url)}" alt="">` : '<div class="mini"></div>'}</td>
         <td><b>${esc(p.nombre)}</b>${p.sku ? `<br><small>${esc(p.sku)}</small>` : ''}</td>
-        <td>${esc(p.categoria)}</td>
+        <td>${p.grupo ? `<small>${esc(p.grupo)} ›</small><br>` : ''}${esc(p.categoria)}</td>
         <td class="num">${p.precio != null ? precio(p.precio, p.moneda) : '<small>Consultar</small>'}</td>
         <td>${p.publicado ? '<span class="pill ok">Visible</span>' : '<span class="pill off">Oculto</span>'}${p.destacado ? ' <span class="pill">★</span>' : ''}</td>
         <td><div class="acciones-fila">
@@ -98,7 +132,7 @@
     aviso('prodMsg', '');
     $('pNombre').value = p?.nombre || '';
     $('pSku').value = p?.sku || '';
-    $('pCategoria').value = p?.categoria || '';
+    selProd.poner(p?.grupo, p?.categoria);
     $('pMarca').value = p?.marca || '';
     $('pDesc').value = p?.descripcion || '';
     $('pCarac').value = (p?.caracteristicas || []).join('\n');
@@ -148,7 +182,7 @@
       const fila = {
         nombre: $('pNombre').value.trim(),
         sku: $('pSku').value.trim() || null,
-        categoria: $('pCategoria').value.trim(),
+        ...selProd.leer(),
         marca: $('pMarca').value.trim() || null,
         descripcion: $('pDesc').value.trim() || null,
         caracteristicas: $('pCarac').value.split('\n').map(s => s.trim()).filter(Boolean),
@@ -198,7 +232,7 @@
     $('tbMayorista').innerHTML = filas.length ? filas.map(p => `
       <tr>
         <td>${esc(p.sku || '—')}</td>
-        <td><b>${esc(p.nombre)}</b>${p.categoria ? `<br><small>${esc(p.categoria)}</small>` : ''}</td>
+        <td><b>${esc(p.nombre)}</b>${p.categoria ? `<br><small>${p.grupo ? esc(p.grupo) + ' › ' : ''}${esc(p.categoria)}</small>` : ''}</td>
         <td class="num">${p.stock} ${esc(p.unidad)}</td>
         <td>${textoTramos(p)}</td>
         <td>${!p.activo ? '<span class="pill off">Inactivo</span>' : p.stock > 0 ? '<span class="pill ok">Visible</span>' : '<span class="pill off">Sin stock</span>'}</td>
@@ -230,7 +264,7 @@
     aviso('mayMsg', '');
     $('mNombre').value = p?.nombre || '';
     $('mSku').value = p?.sku || '';
-    $('mCategoria').value = p?.categoria || '';
+    selMay.poner(p?.grupo, p?.categoria);
     $('mUnidad').value = p?.unidad || 'und';
     $('mStock').value = p?.stock ?? 0;
     $('mMoneda').value = p?.moneda || 'PEN';
@@ -263,7 +297,7 @@
       const fila = {
         nombre: $('mNombre').value.trim(),
         sku: $('mSku').value.trim() || null,
-        categoria: $('mCategoria').value.trim() || null,
+        ...selMay.leer(),
         unidad: $('mUnidad').value.trim() || 'und',
         stock: parseInt($('mStock').value, 10) || 0,
         moneda: $('mMoneda').value,

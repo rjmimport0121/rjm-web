@@ -52,7 +52,7 @@
       <button class="btn" id="btnNuevoProd">+ Nuevo producto</button>
     </div>
     <div class="tabla-wrap"><table>
-      <thead><tr><th>Foto</th><th>Producto</th><th>Categoría</th><th class="num">Precio</th><th>Estado</th><th></th></tr></thead>
+      <thead><tr><th>Foto</th><th>Producto</th><th>Grupo › Subgrupo</th><th class="num">Precio</th><th>Estado</th><th></th></tr></thead>
       <tbody id="tbCatalogo"><tr><td colspan="6">Cargando…</td></tr></tbody>
     </table></div>
   </section>
@@ -102,8 +102,12 @@
     <div id="prodMsg"></div>
     <div class="campo"><label for="pNombre">Nombre *</label><input id="pNombre" required maxlength="140"/></div>
     <div class="fila">
+      <div class="campo"><label for="pGrupo">Grupo *</label><select id="pGrupo" required></select></div>
+      <div class="campo"><label for="pSubgrupo">Subgrupo *</label><select id="pSubgrupo" required></select>
+        <input id="pSubOtro" class="oculto" placeholder="Nombre del subgrupo nuevo" maxlength="60" style="margin-top:.4rem"/></div>
+    </div>
+    <div class="fila">
       <div class="campo"><label for="pSku">SKU / código</label><input id="pSku" maxlength="60"/></div>
-      <div class="campo"><label for="pCategoria">Categoría *</label><input id="pCategoria" list="listaCategorias" required/></div>
       <div class="campo"><label for="pMarca">Marca</label><input id="pMarca"/></div>
     </div>
     <div class="campo"><label for="pDesc">Descripción</label><textarea id="pDesc" maxlength="2000"></textarea></div>
@@ -129,9 +133,6 @@
     </div>
   </form>
 </div>
-<datalist id="listaCategorias">
-  <option>Accesorios para guitarra</option><option>Electrónica para instrumentos</option><option>Luthiería</option>
-</datalist>
 
 <!-- MODAL: producto mayorista -->
 <div class="modal-fondo oculto" id="modalMay">
@@ -141,7 +142,11 @@
     <div class="campo"><label for="mNombre">Nombre *</label><input id="mNombre" required maxlength="140"/></div>
     <div class="fila">
       <div class="campo"><label for="mSku">SKU / código</label><input id="mSku" maxlength="60"/></div>
-      <div class="campo"><label for="mCategoria">Categoría</label><input id="mCategoria" list="listaCategorias"/></div>
+      <div class="campo"><label for="mGrupo">Grupo</label><select id="mGrupo"></select></div>
+      <div class="campo"><label for="mCategoria">Subgrupo</label><select id="mCategoria"></select>
+        <input id="mSubOtro" class="oculto" placeholder="Nombre del subgrupo nuevo" maxlength="60" style="margin-top:.4rem"/></div>
+    </div>
+    <div class="fila">
       <div class="campo"><label for="mUnidad">Unidad</label><input id="mUnidad" value="und" maxlength="20"/></div>
     </div>
     <div class="fila">
@@ -170,6 +175,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="js/config.js"></script>
 <script src="js/comun.js"></script>
+<script src="js/categorias.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>
