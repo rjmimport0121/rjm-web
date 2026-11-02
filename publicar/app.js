@@ -346,6 +346,7 @@
 
   // ---------- Instalar como app ----------
   const instalada = matchMedia('(display-mode: standalone)').matches || !!window.RJMAndroid;
+  if (window.RJMAndroid) $('enlaceApk').hidden = true; // ya está en la app de Android
   addEventListener('beforeinstallprompt', e => { e.preventDefault(); if (instalada) return; avisoInstalar = e; $('btnInstalar').hidden = false; });
   $('btnInstalar').addEventListener('click', async () => {
     if (!avisoInstalar) return; avisoInstalar.prompt();
