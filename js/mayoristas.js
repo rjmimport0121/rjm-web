@@ -92,6 +92,7 @@
     $('total').textContent = Object.keys(porMoneda).length
       ? Object.entries(porMoneda).map(([m, v]) => precio(v, m)).join(' + ') : 'S/ 0.00';
     $('btnPedido').disabled = !hay;
+    $('btnPdf').disabled = !hay;
   }
 
   $('buscar').addEventListener('input', pintar);
@@ -102,13 +103,19 @@
     pintar();
   });
 
-  // Pedido -> proforma por WhatsApp (precios con IGV incluido).
-  function proforma() {
+  // ---------- Proforma (precios con IGV incluido) ----------
+  const EMPRESA = {
+    nombre: 'RJM Import-Export E.I.R.L.',
+    ruc: '20610045171',
+    banco: 'BCP Soles N° 2207106419030 · CCI 00222000710641903020',
+    lineas: ['RUC 20610045171', 'Mz. G Lt. 06 Asc. Basilio Auqui, Huamanga - Ayacucho', 'WhatsApp: +51 956 543 522', 'rjm.import.export@gmail.com', 'www.rjmimport.com'],
+  };
+
+  function datosProforma() {
     const ahora = new Date();
     const dos = n => String(n).padStart(2, '0');
     const numero = `PM-${String(ahora.getFullYear()).slice(2)}${dos(ahora.getMonth() + 1)}${dos(ahora.getDate())}-${dos(ahora.getHours())}${dos(ahora.getMinutes())}`;
-    const items = [];
-    const porMoneda = {};
+    const items = [], porMoneda = {};
     for (const x of lista) {
       const c = cantidades[x.id]; if (!c) continue;
       const pu = precioPara(x, c); if (pu == null) continue;
@@ -116,24 +123,142 @@
       porMoneda[x.moneda] = (porMoneda[x.moneda] || 0) + importe;
       items.push({ x, c, pu, importe });
     }
+    const total = Object.entries(porMoneda).map(([m, v]) => precio(v, m)).join(' + ');
+    return { numero, fecha: ahora.toLocaleDateString('es-PE'), items, total };
+  }
+
+  function textoProforma(d) {
     const linea = '------------------------------';
-    let t = `*PROFORMA N° ${numero}*\nRJM Import-Export E.I.R.L.\nFecha: ${ahora.toLocaleDateString('es-PE')}\n${linea}\n`;
+    let t = `*PROFORMA N° ${d.numero}*\n${EMPRESA.nombre}\nRUC ${EMPRESA.ruc}\nFecha: ${d.fecha}\n${linea}\n`;
     t += `*Cliente:* ${perfil.nombre || perfil.usuario}\n`;
     if (perfil.ruc) t += `*RUC/DNI:* ${perfil.ruc}\n`;
     if (perfil.telefono) t += `*Teléfono:* ${perfil.telefono}\n`;
     t += `*Usuario:* ${perfil.usuario}\n${linea}\n`;
-    items.forEach(({ x, c, pu, importe }, n) => {
+    d.items.forEach(({ x, c, pu, importe }, n) => {
       t += `${n + 1}) ${x.nombre}\n`;
       if (x.sku) t += `   Cód. ${x.sku}\n`;
       t += `   ${c} ${x.unidad} x ${precio(pu, x.moneda)} = ${precio(importe, x.moneda)}\n`;
     });
-    t += `${linea}\n*TOTAL (IGV incluido): ${Object.entries(porMoneda).map(([m, v]) => precio(v, m)).join(' + ')}*\n`;
-    t += `${linea}\nPrecios con IGV incluido.\nSujeto a confirmación de stock.`;
+    t += `${linea}\n*TOTAL (IGV incluido): ${d.total}*\n`;
+    t += `${linea}\nPrecios con IGV incluido.\nSujeto a confirmación de stock.\n*Pago:* ${EMPRESA.banco}`;
     return t;
   }
 
+  // Carga jsPDF sólo cuando se pide el PDF (está alojado en la propia web: js/vendor).
+  let cargaPdf = null;
+  function cargarScript(src) {
+    return new Promise((ok, mal) => {
+      const s = document.createElement('script');
+      s.src = src; s.onload = ok; s.onerror = () => mal(new Error('No se pudo cargar ' + src));
+      document.head.append(s);
+    });
+  }
+  function libreriaPdf() {
+    if (!cargaPdf) cargaPdf = cargarScript('js/vendor/jspdf-4.2.1.umd.min.js')
+      .then(() => cargarScript('js/vendor/jspdf.plugin.autotable-5.0.9.min.js'))
+      .catch(e => { cargaPdf = null; throw e; });
+    return cargaPdf;
+  }
+  async function logoDataUrl() {
+    try {
+      const r = await fetch('img/logo-192.png');
+      const b = await r.blob();
+      return await new Promise(ok => { const f = new FileReader(); f.onload = () => ok(f.result); f.readAsDataURL(b); });
+    } catch (_) { return null; }
+  }
+
+  async function pdfProforma(d) {
+    await libreriaPdf();
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'mm', format: 'a4' });
+    const ancho = doc.internal.pageSize.getWidth(), m = 15;
+    const azul = [37, 99, 235], gris = [90, 100, 115];
+
+    const logo = await logoDataUrl();
+    if (logo) doc.addImage(logo, 'PNG', m, 12, 22, 22);
+    const xEmp = logo ? m + 26 : m;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(20);
+    doc.text(EMPRESA.nombre, xEmp, 18);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5); doc.setTextColor(...gris);
+    EMPRESA.lineas.forEach((l, n) => doc.text(l, xEmp, 23 + n * 4));
+
+    // Recuadro del número de proforma
+    doc.setDrawColor(...azul); doc.setLineWidth(0.5);
+    doc.roundedRect(ancho - m - 62, 12, 62, 24, 2, 2);
+    doc.setTextColor(...azul); doc.setFont('helvetica', 'bold'); doc.setFontSize(14);
+    doc.text('PROFORMA', ancho - m - 31, 20, { align: 'center' });
+    doc.setFontSize(10.5); doc.text('N° ' + d.numero, ancho - m - 31, 26.5, { align: 'center' });
+    doc.setTextColor(...gris); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+    doc.text('Fecha: ' + d.fecha, ancho - m - 31, 32, { align: 'center' });
+
+    // Cliente
+    let y = 50;
+    doc.setFillColor(243, 246, 251); doc.rect(m, y - 5, ancho - 2 * m, 20, 'F');
+    doc.setTextColor(20); doc.setFontSize(9.5);
+    const filaCli = (et, val, x, yy) => { doc.setFont('helvetica', 'bold'); doc.text(et, x, yy); doc.setFont('helvetica', 'normal'); doc.text(String(val || '—'), x + 22, yy); };
+    filaCli('Cliente:', perfil.nombre || perfil.usuario, m + 3, y);
+    filaCli('RUC/DNI:', perfil.ruc, m + 3, y + 6);
+    filaCli('Teléfono:', perfil.telefono, ancho / 2 + 5, y + 6);
+    filaCli('Usuario:', perfil.usuario, m + 3, y + 12);
+
+    // Detalle
+    doc.autoTable({
+      startY: y + 20,
+      margin: { left: m, right: m },
+      head: [['#', 'Código', 'Descripción', 'Cant.', 'Und.', 'P. Unit.', 'Importe']],
+      body: d.items.map(({ x, c, pu, importe }, n) => [n + 1, x.sku || '—', x.nombre, c, x.unidad, precio(pu, x.moneda), precio(importe, x.moneda)]),
+      styles: { font: 'helvetica', fontSize: 9, cellPadding: 2.2, textColor: 30 },
+      headStyles: { fillColor: azul, textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [247, 249, 252] },
+      columnStyles: { 0: { halign: 'center', cellWidth: 8 }, 1: { cellWidth: 24 }, 3: { halign: 'right', cellWidth: 14 },
+        4: { halign: 'center', cellWidth: 13 }, 5: { halign: 'right', cellWidth: 25 }, 6: { halign: 'right', cellWidth: 28 } },
+      didParseCell: c => { if (c.section === 'head') c.cell.styles.halign = [0, 4].includes(c.column.index) ? 'center' : [3, 5, 6].includes(c.column.index) ? 'right' : 'left'; },
+    });
+
+    // Total
+    y = doc.lastAutoTable.finalY + 6;
+    if (y > 260) { doc.addPage(); y = 20; }
+    doc.setFillColor(...azul); doc.rect(ancho - m - 80, y - 5, 80, 10, 'F');
+    doc.setTextColor(255); doc.setFont('helvetica', 'bold'); doc.setFontSize(11);
+    doc.text('TOTAL (IGV incluido): ' + d.total, ancho - m - 3, y + 1.5, { align: 'right' });
+
+    doc.setTextColor(...gris); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
+    ['Precios con IGV incluido.', 'Sujeto a confirmación de stock.', 'Documento informativo: no es un comprobante de pago.']
+      .forEach((l, n) => doc.text('• ' + l, m, y + 14 + n * 4.5));
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(20); doc.setFontSize(9);
+    doc.text('Cuenta para el pago:', m, y + 32);
+    doc.setFont('helvetica', 'normal'); doc.text(EMPRESA.banco, m + 34, y + 32);
+
+    const nombre = `Proforma-${d.numero}.pdf`;
+    return new File([doc.output('blob')], nombre, { type: 'application/pdf' });
+  }
+
   $('btnPedido').addEventListener('click', () => {
-    window.open(RJM.waLink(proforma()), '_blank', 'noopener');
+    window.open(RJM.waLink(textoProforma(datosProforma())), '_blank', 'noopener');
+  });
+
+  // PDF: en el celular se comparte directo (WhatsApp aparece en la lista);
+  // en la computadora se descarga para adjuntarlo en WhatsApp.
+  $('btnPdf').addEventListener('click', async () => {
+    const btn = $('btnPdf'), etiqueta = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Generando PDF…'; aviso('listaMsg', '');
+    try {
+      const d = datosProforma();
+      const archivo = await pdfProforma(d);
+      if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
+        try {
+          await navigator.share({ files: [archivo], title: 'Proforma ' + d.numero, text: `Proforma ${d.numero} – ${perfil.nombre || perfil.usuario}` });
+          return;
+        } catch (e) { if (e.name === 'AbortError') return; }
+      }
+      const url = URL.createObjectURL(archivo);
+      const a = Object.assign(document.createElement('a'), { href: url, download: archivo.name });
+      document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+      aviso('listaMsg', `PDF descargado (${archivo.name}). Adjúntalo en tu chat de WhatsApp con RJM.`, 'ok');
+    } catch (e) {
+      aviso('listaMsg', 'No se pudo generar el PDF: ' + e.message);
+    } finally { btn.disabled = $('btnPedido').disabled; btn.textContent = etiqueta; }
   });
 
   iniciar();
