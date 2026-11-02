@@ -461,6 +461,11 @@
       ? `El consumidor pidió la respuesta por CARTA a: ${r.domicilio}. Descarga el PDF, imprímelo y envíalo.`
       : `El consumidor pidió la respuesta por CORREO a: ${r.correo}. Responder antes de: ${HOJA.fechaCorta(vence(r))}.`;
     $('rcCorreo').classList.toggle('oculto', !r.correo);
+    $('rcProponer').classList.toggle('oculto', !r.correo);
+    const tel = String(r.telefono || '').replace(/\D/g, '');
+    const telWa = tel.length === 9 && tel.startsWith('9') ? '51' + tel : tel;
+    $('rcWhatsapp').classList.toggle('oculto', telWa.length < 9);
+    $('rcWhatsapp').href = `https://wa.me/${telWa}?text=${encodeURIComponent(`Hola ${r.nombre}, le escribimos de ${HOJA.EMPRESA.razonSocial} por su ${r.tipo} N.° ${r.codigo}. Queremos ayudarle a solucionarlo lo antes posible.`)}`;
     $('rcCopia').classList.toggle('oculto', !(r.correo && !r.correo_enviado));
     $('modalReclamo').classList.remove('oculto');
     $('rcObs').focus();
@@ -479,6 +484,18 @@
     const r = reclamoActual; if (!r || !r.correo) return;
     abrirCorreo(r.correo, `Respuesta a su Hoja de Reclamación N.° ${r.codigo} — ${HOJA.EMPRESA.razonSocial}`, cartaRespuesta(r, $('rcObs').value.trim()));
     aviso('reclamoMsg', 'Se abrió tu programa de correo. Envía el mensaje y luego marca la hoja como "Respondido" y guarda.', 'info');
+  });
+  // Ofrecimiento de solución no presencial (Reglamento, art. 6-A.2 b): el cliente debe aceptarlo
+  // expresamente con la frase indicada; mientras tanto, el plazo se suspende hasta 5 días hábiles.
+  $('rcProponer').addEventListener('click', () => {
+    const r = reclamoActual; if (!r || !r.correo) return;
+    const E = HOJA.EMPRESA, propuesta = $('rcObs').value.trim();
+    abrirCorreo(r.correo, `Propuesta de solución a su Hoja de Reclamación N.° ${r.codigo} — ${E.razonSocial}`,
+      `Señor(a) ${r.nombre}:\n\nEn atención a su ${r.tipo} registrado(a) con la Hoja de Reclamación N.° ${r.codigo}, le proponemos la siguiente solución:\n\n` +
+      `${propuesta || '[Escriba aquí la solución que ofrece]'}\n\nSi está de acuerdo, por favor responda este correo con la frase: ACUERDO ACEPTADO PARA SOLUCIONAR EL RECLAMO\n\n` +
+      `Si no está de acuerdo, igual le enviaremos nuestra respuesta formal dentro del plazo legal.\n\nAtentamente,\n${E.razonSocial}\nRUC ${E.ruc}\n${E.correo} · WhatsApp ${E.whatsapp}`);
+    if ($('rcEstado').value === 'pendiente') $('rcEstado').value = 'en_proceso';
+    aviso('reclamoMsg', 'Envía la propuesta desde tu correo y guarda la hoja como "En proceso". Si el cliente acepta, copia su respuesta en el campo de respuesta y márcala como "Respondido".', 'info');
   });
   $('rcCopiar').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(cartaRespuesta(reclamoActual, $('rcObs').value.trim())); aviso('reclamoMsg', 'Respuesta copiada: pégala en tu correo o en la carta.', 'ok'); }

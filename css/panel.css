@@ -125,3 +125,5 @@ h1,h2,h3{letter-spacing:-.02em;font-weight:800}
 .vence-pronto{color:#fcd34d}
 .vencido{color:#fca5a5;font-weight:700}
 @media(max-width:600px){.hoja-panel dl{grid-template-columns:1fr}.hoja-panel dd{margin-bottom:.4rem}}
+.solucion{margin:.4rem 0 1rem;padding:.9rem 1rem;border:1px dashed var(--border);border-radius:12px;font-size:.82rem;color:var(--text2)}
+.solucion p{margin-bottom:.6rem}
