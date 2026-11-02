@@ -115,3 +115,13 @@ label,th,.pill,.top .marca small{letter-spacing:.06em;font-weight:600}
 h1,h2,h3{letter-spacing:-.02em;font-weight:800}
 #tbLista td:nth-child(1){font-variant-numeric:tabular-nums;letter-spacing:.02em}
 .btn{font-weight:700;letter-spacing:.01em}
+
+/* Libro de Reclamaciones (pestaña del panel) */
+.modal-ancho{max-width:760px}
+.hoja-panel h3,.sub-h{font-size:.95rem;margin:1.2rem 0 .5rem;padding-bottom:.35rem;border-bottom:1px solid var(--border);color:var(--cyan)}
+.hoja-panel dl{display:grid;grid-template-columns:minmax(120px,34%) 1fr;gap:.35rem .9rem;font-size:.85rem}
+.hoja-panel dt{color:var(--text)}
+.hoja-panel dd{color:var(--white);white-space:pre-wrap;overflow-wrap:anywhere}
+.vence-pronto{color:#fcd34d}
+.vencido{color:#fca5a5;font-weight:700}
+@media(max-width:600px){.hoja-panel dl{grid-template-columns:1fr}.hoja-panel dd{margin-bottom:.4rem}}

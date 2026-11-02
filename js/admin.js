@@ -1,4 +1,5 @@
-// Panel de administración RJM: catálogo web, lista mayorista y usuarios mayoristas.
+// Panel de administración RJM: catálogo web, lista mayorista, usuarios mayoristas
+// y respuestas del Libro de Reclamaciones.
 (function () {
   const $ = id => document.getElementById(id);
   const { sb, esc, precio } = RJM;
@@ -78,13 +79,13 @@
     $('vistaPanel').classList.remove('oculto');
     $('btnSalir').classList.remove('oculto');
     $('quien').textContent = perfil.usuario || perfil.email;
-    cargarCatalogo(); cargarMayorista(); cargarUsuarios();
+    cargarCatalogo(); cargarMayorista(); cargarUsuarios(); cargarReclamos();
   }
 
   // ---------------- PESTAÑAS ----------------
   document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
     document.querySelectorAll('.tab').forEach(x => x.classList.toggle('activo', x === t));
-    ['catalogo', 'mayorista', 'usuarios'].forEach(n => $('tab-' + n).classList.toggle('oculto', n !== t.dataset.tab));
+    ['catalogo', 'mayorista', 'usuarios', 'reclamos'].forEach(n => $('tab-' + n).classList.toggle('oculto', n !== t.dataset.tab));
     aviso('panelMsg', '');
   }));
   document.querySelectorAll('[data-cerrar]').forEach(b => b.addEventListener('click', () => b.closest('.modal-fondo').classList.add('oculto')));
@@ -397,6 +398,119 @@
         cargarUsuarios();
       }
     } catch (err) { aviso('panelMsg', err.message); }
+  });
+
+  // ---------------- LIBRO DE RECLAMACIONES ----------------
+  // Las hojas las registra la Edge Function "libro-reclamaciones". Aquí solo se
+  // leen y se completa la sección 4 (respuesta). No se pueden borrar ni editar
+  // los datos del consumidor (lo impide la base de datos).
+  const HOJA = window.RJM_HOJA;
+  let reclamos = [], reclamoActual = null;
+  const hoyLima = () => new Date(Date.now() - 5 * 3600e3).toISOString().slice(0, 10);
+  const ESTADOS = { pendiente: ['Pendiente', 'off'], en_proceso: ['En proceso', ''], respondido: ['Respondido', 'ok'] };
+
+  async function cargarReclamos() {
+    const { data, error } = await sb.from('reclamaciones').select('*').order('creado_en', { ascending: false });
+    if (error) {
+      $('tbReclamos').innerHTML = '<tr><td colspan="7">No se pudo leer el libro.</td></tr>';
+      return aviso('reclamosMsg', /does not exist|relation|schema cache/i.test(error.message)
+        ? 'Falta crear el Libro de Reclamaciones en Supabase: ejecuta supabase/reclamaciones.sql en el SQL Editor.'
+        : RJM.errorLegible(error), 'info');
+    }
+    reclamos = data; pintarReclamos();
+  }
+  function vence(r) { return HOJA.sumarDiasHabiles(r.creado_en, 15); }
+  function pintarReclamos() {
+    const filtro = $('filtroReclamos').value;
+    const filas = reclamos.filter(r => filtro === 'todas' || (filtro === 'respondido' ? r.estado === 'respondido' : r.estado !== 'respondido'));
+    const abiertas = reclamos.filter(r => r.estado !== 'respondido').length;
+    $('reclamosPend').textContent = abiertas;
+    $('reclamosPend').classList.toggle('oculto', !abiertas);
+    const hoy = hoyLima();
+    $('tbReclamos').innerHTML = filas.length ? filas.map(r => {
+      const limite = vence(r), [txt, clase] = ESTADOS[r.estado] || [r.estado, ''];
+      const dias = Math.round((Date.parse(limite) - Date.parse(hoy)) / 864e5);
+      const marca = r.estado === 'respondido' ? '' : dias < 0 ? 'vencido' : dias <= 4 ? 'vence-pronto' : '';
+      return `<tr>
+        <td><b>${esc(r.codigo)}</b>${r.correo && !r.correo_enviado ? '<br><small class="vence-pronto">Copia por correo pendiente</small>' : ''}</td>
+        <td>${esc(HOJA.fechaHora(r.creado_en))}</td>
+        <td>${esc(r.nombre)}<br><small>${esc(r.tipo_documento)} ${esc(r.numero_documento)}</small></td>
+        <td>${r.tipo === 'queja' ? 'Queja' : 'Reclamo'}</td>
+        <td class="${marca}">${r.estado === 'respondido' ? '—' : esc(HOJA.fechaCorta(limite)) + (dias < 0 ? ' (vencido)' : '')}</td>
+        <td><span class="pill ${clase}">${esc(txt)}</span></td>
+        <td><button class="btn sec chico" data-reclamo="${r.id}">Ver y responder</button></td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="7">${reclamos.length ? 'No hay hojas con este filtro.' : 'Aún no hay hojas de reclamación. ¡Bien!'}</td></tr>`;
+  }
+  $('filtroReclamos').addEventListener('change', pintarReclamos);
+  $('tbReclamos').addEventListener('click', e => {
+    const id = e.target.dataset.reclamo;
+    if (id) abrirReclamo(reclamos.find(r => r.id === id));
+  });
+
+  function abrirReclamo(r) {
+    reclamoActual = r;
+    aviso('reclamoMsg', '');
+    $('tituloReclamo').textContent = `Hoja de reclamación N.° ${r.codigo}`;
+    $('hojaPanel').innerHTML = HOJA.secciones(r).slice(0, 4).map(([t, filas]) =>
+      `<h3>${esc(t)}</h3><dl>${filas.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join('')}</dl>`).join('');
+    $('rcObs').value = r.observaciones || '';
+    $('rcEstado').value = r.estado;
+    $('rcFecha').value = r.fecha_respuesta || '';
+    $('rcVia').textContent = r.respuesta_por === 'carta'
+      ? `El consumidor pidió la respuesta por CARTA a: ${r.domicilio}. Descarga el PDF, imprímelo y envíalo.`
+      : `El consumidor pidió la respuesta por CORREO a: ${r.correo}. Responder antes de: ${HOJA.fechaCorta(vence(r))}.`;
+    $('rcCorreo').classList.toggle('oculto', !r.correo);
+    $('rcCopia').classList.toggle('oculto', !(r.correo && !r.correo_enviado));
+    $('modalReclamo').classList.remove('oculto');
+    $('rcObs').focus();
+  }
+  $('rcEstado').addEventListener('change', () => { if ($('rcEstado').value === 'respondido' && !$('rcFecha').value) $('rcFecha').value = hoyLima(); });
+
+  function cartaRespuesta(r, observaciones) {
+    const E = HOJA.EMPRESA;
+    return `Señor(a) ${r.nombre}:\n\nEn atención a su ${r.tipo} registrado(a) en nuestro Libro de Reclamaciones virtual con la Hoja de Reclamación N.° ${r.codigo}, ` +
+      `presentada el ${HOJA.fechaHora(r.creado_en)}, le informamos lo siguiente:\n\n${observaciones || '[Escriba aquí la respuesta]'}\n\n` +
+      `Atentamente,\n${E.razonSocial}\nRUC ${E.ruc}\n${E.correo} · WhatsApp ${E.whatsapp}\n${E.web}`;
+  }
+  const abrirCorreo = (para, asunto, cuerpo) => { location.href = `mailto:${encodeURIComponent(para)}?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`; };
+
+  $('rcCorreo').addEventListener('click', () => {
+    const r = reclamoActual; if (!r || !r.correo) return;
+    abrirCorreo(r.correo, `Respuesta a su Hoja de Reclamación N.° ${r.codigo} — ${HOJA.EMPRESA.razonSocial}`, cartaRespuesta(r, $('rcObs').value.trim()));
+    aviso('reclamoMsg', 'Se abrió tu programa de correo. Envía el mensaje y luego marca la hoja como "Respondido" y guarda.', 'info');
+  });
+  $('rcCopiar').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(cartaRespuesta(reclamoActual, $('rcObs').value.trim())); aviso('reclamoMsg', 'Respuesta copiada: pégala en tu correo o en la carta.', 'ok'); }
+    catch (_) { aviso('reclamoMsg', 'No se pudo copiar. Selecciona el texto de la respuesta y cópialo a mano.'); }
+  });
+  $('rcCopia').addEventListener('click', () => {
+    const r = reclamoActual; if (!r || !r.correo) return;
+    abrirCorreo(r.correo, `Hoja de Reclamación N.° ${r.codigo} — ${HOJA.EMPRESA.razonSocial}`,
+      `Hola ${r.nombre}: esta es la copia de su Hoja de Reclamación registrada en nuestro Libro de Reclamaciones virtual.\n\n${HOJA.texto({ ...r, observaciones: null, fecha_respuesta: null })}`);
+    aviso('reclamoMsg', 'Después de enviar la copia, se marcará como enviada al guardar.', 'info');
+    reclamoActual._copiaManual = true;
+  });
+  $('rcPdf').addEventListener('click', async () => {
+    const r = reclamoActual; if (!r) return;
+    try { HOJA.descargar(await HOJA.pdf({ ...r, observaciones: $('rcObs').value.trim() || r.observaciones, fecha_respuesta: $('rcFecha').value || r.fecha_respuesta })); }
+    catch (err) { aviso('reclamoMsg', 'No se pudo crear el PDF: ' + err.message); }
+  });
+
+  $('formReclamo').addEventListener('submit', async e => {
+    e.preventDefault();
+    const r = reclamoActual; if (!r) return;
+    const cambios = { observaciones: $('rcObs').value.trim() || null, estado: $('rcEstado').value, fecha_respuesta: $('rcFecha').value || null };
+    if (cambios.estado === 'respondido' && !cambios.observaciones) return aviso('reclamoMsg', 'Escribe la respuesta antes de marcarla como "Respondido".');
+    if (cambios.estado === 'respondido' && !cambios.fecha_respuesta) return aviso('reclamoMsg', 'Indica la fecha en que comunicaste la respuesta.');
+    if (r._copiaManual) { cambios.correo_enviado = true; cambios.correo_error = null; }
+    ocupado('rcGuardar', true);
+    const { error } = await sb.from('reclamaciones').update(cambios).eq('id', r.id);
+    ocupado('rcGuardar', false);
+    if (error) return aviso('reclamoMsg', RJM.errorLegible(error));
+    $('modalReclamo').classList.add('oculto');
+    aviso('reclamosMsg', `Hoja ${r.codigo} guardada.`, 'ok');
+    cargarReclamos();
   });
 
   iniciar();

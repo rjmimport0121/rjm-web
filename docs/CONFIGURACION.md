@@ -57,6 +57,22 @@ Para probar todo sin cargar productos reales:
 
 Los productos de prueba tienen el SKU `DEMO-...` y se editan como cualquier otro en `admin.html`. Los del catálogo web quedan **ocultos** para que ningún cliente vea precios de prueba. Al final del script hay instrucciones para publicarlos o borrarlos.
 
+### 8. Libro de Reclamaciones virtual (obligatorio para vender en línea)
+La web trae la página `libro-reclamaciones.html` (enlazada desde la portada, el pie y el menú) y la pestaña **Libro de Reclamaciones** del panel. Para que funcione:
+
+1. **SQL Editor → New query**: pega `supabase/reclamaciones.sql` y pulsa **Run**. Crea la tabla de hojas con número correlativo sin saltos. Solo el admin puede leerlas y responderlas, y nadie puede borrarlas ni cambiar lo que escribió el consumidor.
+2. **Edge Functions → Deploy a new function → Via Editor**, nombre exacto `libro-reclamaciones`. Sube los dos archivos de `supabase/functions/libro-reclamaciones/` (`index.ts` y `hoja.ts`). **Desactiva *Verify JWT***: es un formulario público y la función hace sus propias validaciones (datos, trampa para robots y máximo 5 hojas por hora desde una misma conexión).
+3. **Envío automático de la copia al correo** (lo exige el art. 4-B del Reglamento para tiendas virtuales):
+   1. Crea una cuenta gratuita en <https://resend.com> y agrega el dominio `rjmimport.com` (**Domains → Add domain**).
+   2. Resend te mostrará unos registros DNS. Cópialos en **Cloudflare → rjmimport.com → DNS → Add record**, uno por uno, y espera a que Resend muestre el dominio como *Verified*.
+   3. En Resend, **API Keys → Create API key** (permiso *Sending access*). Cópiala **sin pegarla en ningún chat**.
+   4. En Supabase, **Edge Functions → Secrets → Add new secret**: nombre `RESEND_API_KEY` y como valor la clave.
+   5. (Opcional) Secreto `RECLAMOS_REMITENTE` con el remitente, por ejemplo `RJM Import-Export <reclamaciones@rjmimport.com>`, y `RECLAMOS_COPIA_RJM` con el correo que recibe copia de cada hoja (por defecto `rjm.import.export@gmail.com`).
+   Mientras no exista `RESEND_API_KEY`, las hojas **se registran igual**. Aun así, el consumidor no recibe la copia por correo y el panel muestra "Copia por correo pendiente". En ese caso envíala desde el panel con **Enviar copia de la hoja**.
+4. Prueba: llena una hoja de prueba con tu propio correo, revisa que llegue la copia y respóndela desde el panel.
+
+Plazos y reglas (verificar si cambian): responder en máximo **15 días hábiles**, por escrito (correo o carta, según pidió el consumidor), y conservar las hojas al menos **2 años**. Si atiendes al público en un local físico, ahí necesitas además un libro físico o virtual disponible en el mismo local (Reglamento, arts. 4 y 4-A).
+
 ## Uso diario
 - **Administración:** `https://www.rjmimport.com/admin.html` (también hay un enlace discreto en el pie de página).
 - **Mayoristas:** `https://www.rjmimport.com/mayoristas.html` (enlace "Mayoristas" en el menú).
@@ -70,6 +86,7 @@ Los productos de prueba tienen el SKU `DEMO-...` y se editan como cualquier otro
 - Un mayorista activo puede leer la lista mayorista (solo activos con stock y sus precios) y su propio perfil. No puede modificar nada ni cambiar su rol.
 - Solo el admin puede escribir productos, precios y fotos.
 - Las páginas `admin.html` y `mayoristas.html` tienen `noindex` para que Google no las indexe.
+- Libro de Reclamaciones: los visitantes no pueden leer ninguna hoja. Solo el admin las lee y completa la respuesta (sección 4). La base de datos impide borrar hojas o cambiar los datos del consumidor (probado con PostgreSQL 16).
 
 ## Límites y costos a vigilar
 - El plan gratuito de Supabase alcanza de sobra para un catálogo y decenas de mayoristas. Los límites exactos están en <https://supabase.com/pricing>.

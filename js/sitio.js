@@ -409,7 +409,8 @@
     const spot = document.createElement('a');
     spot.className = 'spot';
     spot.href = '#producto=' + p.id;
-    spot.innerHTML = `<span class="etq">${p.destacado ? 'Destacado' : 'Nuevo en la tienda'}</span>
+    const etiqueta = p.destacado ? 'Destacado' : nuevos.has(p.id) ? 'Nuevo' : '';
+    spot.innerHTML = `${etiqueta ? `<span class="etq">${etiqueta}</span>` : ''}
       <span class="spot-img"><img src="${esc(p.foto_url)}" alt="" width="400" height="400"/></span>
       <b>${esc(p.nombre)}</b><span class="precio">${p.precio != null ? dinero(p.precio, p.moneda) : 'Precio a consultar'}</span>`;
     vitrina.replaceWith(spot);

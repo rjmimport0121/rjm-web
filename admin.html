@@ -38,12 +38,13 @@
 <!-- ============ PANEL ============ -->
 <main id="vistaPanel" class="wrap oculto">
   <h1>Panel de administración</h1>
-  <p class="sub">Gestiona el catálogo público, la lista mayorista y los accesos de tus clientes mayoristas.</p>
+  <p class="sub">Gestiona el catálogo público, la lista mayorista, los accesos de tus clientes mayoristas y el Libro de Reclamaciones.</p>
 
   <nav class="tabs" role="tablist">
     <button class="tab activo" data-tab="catalogo">Catálogo web</button>
     <button class="tab" data-tab="mayorista">Lista mayorista</button>
     <button class="tab" data-tab="usuarios">Usuarios mayoristas</button>
+    <button class="tab" data-tab="reclamos">Libro de Reclamaciones <span class="pill off oculto" id="reclamosPend">0</span></button>
   </nav>
   <div id="panelMsg"></div>
 
@@ -95,7 +96,53 @@
       <tbody id="tbUsuarios"><tr><td colspan="6">Cargando…</td></tr></tbody>
     </table></div>
   </section>
+
+  <!-- LIBRO DE RECLAMACIONES -->
+  <section id="tab-reclamos" class="oculto">
+    <div class="barra">
+      <select id="filtroReclamos" aria-label="Mostrar">
+        <option value="abiertas">Pendientes y en proceso</option>
+        <option value="respondido">Respondidas</option>
+        <option value="todas">Todas</option>
+      </select>
+      <a class="btn sec chico" href="libro-reclamaciones.html" target="_blank" rel="noopener">Ver el libro en la web</a>
+    </div>
+    <p class="sub" style="font-size:.8rem">Responde por escrito en un plazo no mayor a <b>15 días hábiles</b> (por correo o carta, según pidió el consumidor). La fecha límite es un cálculo de ayuda: sin sábados, domingos ni feriados nacionales. Las hojas se conservan al menos 2 años y no se pueden borrar.</p>
+    <div id="reclamosMsg"></div>
+    <div class="tabla-wrap"><table>
+      <thead><tr><th>N.° de hoja</th><th>Presentada</th><th>Consumidor</th><th>Tipo</th><th>Responder antes de</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="tbReclamos"><tr><td colspan="7">Cargando…</td></tr></tbody>
+    </table></div>
+  </section>
 </main>
+
+<!-- MODAL: hoja de reclamación -->
+<div class="modal-fondo oculto" id="modalReclamo">
+  <form class="modal modal-ancho" id="formReclamo">
+    <h2 id="tituloReclamo">Hoja de reclamación</h2>
+    <div id="reclamoMsg"></div>
+    <div class="hoja-panel" id="hojaPanel"></div>
+    <h3 class="sub-h">4. Observaciones y acciones adoptadas por el proveedor</h3>
+    <div class="campo"><label for="rcObs">Respuesta al consumidor</label>
+      <textarea id="rcObs" maxlength="4000" rows="6" placeholder="Explica qué se revisó y qué solución se da (cambio, devolución, envío del faltante, etc.)."></textarea></div>
+    <div class="fila">
+      <div class="campo"><label for="rcEstado">Estado</label>
+        <select id="rcEstado"><option value="pendiente">Pendiente</option><option value="en_proceso">En proceso</option><option value="respondido">Respondido</option></select></div>
+      <div class="campo"><label for="rcFecha">Fecha de comunicación de la respuesta</label><input id="rcFecha" type="date"/></div>
+    </div>
+    <p class="sub" id="rcVia" style="font-size:.8rem"></p>
+    <div class="acciones-fila">
+      <button type="button" class="btn sec chico" id="rcCorreo">Responder por correo</button>
+      <button type="button" class="btn sec chico" id="rcCopiar">Copiar respuesta</button>
+      <button type="button" class="btn sec chico" id="rcPdf">Descargar hoja (PDF)</button>
+      <button type="button" class="btn sec chico oculto" id="rcCopia">Enviar copia de la hoja</button>
+    </div>
+    <div class="pie">
+      <button type="button" class="btn sec" data-cerrar>Cerrar</button>
+      <button class="btn" id="rcGuardar">Guardar respuesta</button>
+    </div>
+  </form>
+</div>
 
 <!-- MODAL: producto del catálogo -->
 <div class="modal-fondo oculto" id="modalProd">
@@ -176,6 +223,7 @@
 <script src="js/config.js"></script>
 <script src="js/comun.js"></script>
 <script src="js/categorias.js"></script>
+<script src="js/hoja-reclamacion.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>
