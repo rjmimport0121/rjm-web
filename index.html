@@ -28,9 +28,9 @@
  "telephone":"+51956543522","address":{"@type":"PostalAddress","addressLocality":"Ayacucho","addressCountry":"PE"},
  "areaServed":"PE","openingHours":"Mo-Sa 09:00-19:00"}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="preload" href="fonts/plus-jakarta-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="preload" href="fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="stylesheet" href="css/fuentes.css"/>
 <style>
 /* ============================================================
    VARIABLES & RESET
@@ -49,9 +49,9 @@
   --text:      #94afc8;
   --text2:     #c8d8eb;
   --white:     #eef4ff;
-  --mono:      'IBM Plex Mono', monospace;
-  --sans:      'IBM Plex Sans', sans-serif;
-  --display:   'Syne', sans-serif;
+  --mono:      'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;  /* etiquetas */
+  --sans:      'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --display:   'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -690,7 +690,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
 </div>
 
 <!-- CINTA DE CATEGORÍAS -->
-<div class="cinta" aria-hidden="true"><div class="cinta-pista"><span>Cuerdas para guitarra</span><span>Clavijeros</span><span>Afinadores</span><span>Preamplificadores</span><span>Pastillas piezo</span><span>Ecualizadores</span><span>Potenciómetros</span><span>Maderas para luthiería</span><span>Trastes</span><span>Cejuelas de hueso</span><span>Diseño 3D y CNC</span><span>Impresión 3D</span><span>Electrónica a medida</span><span>Envíos a todo el Perú</span><span>RMC Pickup Co.</span><span>Go Acoustic Audio</span><span>L.R. Baggs</span><span>Graph Tech Guitar Labs</span><span>Artec Acoustic Specialist</span><span>Guiker</span><span>RJM Preamp Guitars</span><span>Neurasonic</span><span>Cuerdas para guitarra</span><span>Clavijeros</span><span>Afinadores</span><span>Preamplificadores</span><span>Pastillas piezo</span><span>Ecualizadores</span><span>Potenciómetros</span><span>Maderas para luthiería</span><span>Trastes</span><span>Cejuelas de hueso</span><span>Diseño 3D y CNC</span><span>Impresión 3D</span><span>Electrónica a medida</span><span>Envíos a todo el Perú</span><span>RMC Pickup Co.</span><span>Go Acoustic Audio</span><span>L.R. Baggs</span><span>Graph Tech Guitar Labs</span><span>Artec Acoustic Specialist</span><span>Guiker</span><span>RJM Preamp Guitars</span><span>Neurasonic</span></div></div>
+<div class="cinta" aria-hidden="true"><div class="cinta-pista"><span>Cuerdas para guitarra</span><span>Clavijeros</span><span>Afinadores</span><span>Preamplificadores</span><span>Pastillas piezo</span><span>Ecualizadores</span><span>Potenciómetros</span><span>Maderas para luthiería</span><span>Trastes</span><span>Cejuelas de hueso</span><span>Diseño 3D y CNC</span><span>Impresión 3D</span><span>Electrónica a medida</span><span>Envíos a todo el Perú</span><span>RMC Pickup Co.</span><span>Go Acoustic Audio</span><span>L.R. Baggs</span><span>Graph Tech Guitar Labs</span><span>Artec Acoustic Specialist</span><span>RJM Preamp Guitars</span><span>Neurasonic</span><span>Cuerdas para guitarra</span><span>Clavijeros</span><span>Afinadores</span><span>Preamplificadores</span><span>Pastillas piezo</span><span>Ecualizadores</span><span>Potenciómetros</span><span>Maderas para luthiería</span><span>Trastes</span><span>Cejuelas de hueso</span><span>Diseño 3D y CNC</span><span>Impresión 3D</span><span>Electrónica a medida</span><span>Envíos a todo el Perú</span><span>RMC Pickup Co.</span><span>Go Acoustic Audio</span><span>L.R. Baggs</span><span>Graph Tech Guitar Labs</span><span>Artec Acoustic Specialist</span><span>RJM Preamp Guitars</span><span>Neurasonic</span></div></div>
 
 <!-- PRODUCTOS -->
 <section id="productos">
@@ -991,13 +991,6 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
         <div class="marca-acciones">
           <button type="button" class="marca-ver">Ver productos</button>
           <a class="marca-wa" href="https://wa.me/51956543522?text=Hola%20RJM%21%20Quisiera%20informaci%C3%B3n%20sobre%20productos%20Artec%20Acoustic%20Specialist" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp sobre Artec Acoustic Specialist"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.66 15l-1.3 4.74 4.86-1.27A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-2.88.75.77-2.8-.2-.31A8.2 8.2 0 1 1 12 20.2Zm4.5-6.14c-.25-.12-1.46-.72-1.68-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.78.97-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.3-2.88c-.25-.43.25-.4.71-1.33.08-.16.04-.3-.02-.43l-.76-1.82c-.2-.48-.4-.41-.56-.42h-.47a.9.9 0 0 0-.66.31 2.76 2.76 0 0 0-.86 2.05 4.8 4.8 0 0 0 1 2.55 11 11 0 0 0 4.2 3.72c1.57.68 2.18.73 2.97.62.48-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg></a>
-        </div>
-      </article>
-      <article class="marca-card anim" data-marca="Guiker">
-        <div class="marca-logo"><div class="marca-nombre">Guiker</div></div>
-        <div class="marca-acciones">
-          <button type="button" class="marca-ver">Ver productos</button>
-          <a class="marca-wa" href="https://wa.me/51956543522?text=Hola%20RJM%21%20Quisiera%20informaci%C3%B3n%20sobre%20productos%20Guiker" target="_blank" rel="noopener" aria-label="Consultar por WhatsApp sobre Guiker"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-8.66 15l-1.3 4.74 4.86-1.27A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-2.88.75.77-2.8-.2-.31A8.2 8.2 0 1 1 12 20.2Zm4.5-6.14c-.25-.12-1.46-.72-1.68-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.78.97-.14.16-.29.18-.53.06a6.7 6.7 0 0 1-3.3-2.88c-.25-.43.25-.4.71-1.33.08-.16.04-.3-.02-.43l-.76-1.82c-.2-.48-.4-.41-.56-.42h-.47a.9.9 0 0 0-.66.31 2.76 2.76 0 0 0-.86 2.05 4.8 4.8 0 0 0 1 2.55 11 11 0 0 0 4.2 3.72c1.57.68 2.18.73 2.97.62.48-.07 1.46-.6 1.67-1.18.2-.58.2-1.07.14-1.18-.06-.1-.22-.16-.47-.28Z"/></svg></a>
         </div>
       </article>
       <article class="marca-card anim" data-marca="RJM Preamp">

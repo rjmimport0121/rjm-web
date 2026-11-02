@@ -5,7 +5,7 @@
   --blue:#2563eb;--blue-lite:#3b82f6;--cyan:#06b6d4;
   --text:#94afc8;--text2:#c8d8eb;--white:#eef4ff;
   --ok:#22c55e;--warn:#f59e0b;--err:#ef4444;
-  --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;--display:'Syne',sans-serif;
+  --mono:'Inter',system-ui,sans-serif;--sans:'Inter',system-ui,sans-serif;--display:'Plus Jakarta Sans','Inter',system-ui,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);font-weight:400;line-height:1.55;min-height:100vh}
@@ -109,3 +109,9 @@ input,select,textarea{border-radius:10px}
   .btn{min-height:46px}
   .cant{min-height:44px;font-size:1rem}
 }
+
+/* Tipografía: etiquetas legibles (menos espaciado, más peso) */
+label,th,.pill,.top .marca small{letter-spacing:.06em;font-weight:600}
+h1,h2,h3{letter-spacing:-.02em;font-weight:800}
+#tbLista td:nth-child(1){font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.btn{font-weight:700;letter-spacing:.01em}

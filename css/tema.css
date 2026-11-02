@@ -164,7 +164,7 @@
 
 /* ---------- Nuestras marcas ---------- */
 #marcas{background:linear-gradient(180deg,var(--bg),rgba(11,58,110,.18) 50%,var(--bg))}
-.marcas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.1rem;margin-top:2.5rem}
+.marcas-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-top:2.5rem}
 .marca-card{position:relative;border-radius:var(--radio);padding:2rem 1.2rem 1.2rem;min-height:170px;
   display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;
   background:var(--surface);border:1px solid var(--border);overflow:hidden;cursor:pointer;
@@ -215,3 +215,27 @@ a.marca-ver{display:flex;align-items:center;justify-content:center;gap:.3rem}
 /* Logos oficiales (cuando se agreguen como imagen): blanco uniforme sobre fondo oscuro */
 .marca-logo img{max-width:82%;max-height:64px;object-fit:contain;filter:brightness(0) invert(1);opacity:.92;transition:opacity .3s,transform .3s}
 .marca-card:hover .marca-logo img{opacity:1;transform:scale(1.04)}
+.marca-sub{white-space:nowrap;letter-spacing:.2em;font-size:.62rem}
+@media(max-width:600px){.marca-sub{letter-spacing:.12em;font-size:.56rem}.marca-sub::before,.marca-sub::after{width:10px}}
+
+/* ============================================================
+   TIPOGRAFÍA (Plus Jakarta Sans + Inter): legible en PC y celular
+   ============================================================ */
+body{font-weight:400;font-size:16px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,.hero-title,.section-title{font-family:var(--display);font-weight:800;letter-spacing:-.03em}
+.hero-title{line-height:1.04}
+.section-title{line-height:1.12}
+.section-sub,.hero-desc{font-size:1.02rem;line-height:1.7;color:#a9bfd6}
+/* Etiquetas en mayúsculas: menos separación entre letras y más peso = se leen mejor */
+.tag,.nav-logo-badge,.hero-eyebrow,.hero-card-label,.metric-label,.badge,.stat-l,.product-img-ph span,
+.product-badge,.product-cat,.product-action,.about-card-footer-label,.contact-label,.f-group label,
+.footer-col h4,.dyn-filtro,.product-price small,.chip,.buscador-info,.btn-lista,.lista-fab,.lista-enviar,
+.marca-ver,.marca-sub{letter-spacing:.08em;font-weight:600}
+.hero-eyebrow{letter-spacing:.14em}
+.service-features li,.footer-legal{letter-spacing:.01em}
+.nav-links a{font-weight:500;letter-spacing:.04em}
+.btn,.btn-submit,.nav-cta{font-weight:700;letter-spacing:.04em}
+.product-name,.service-name,.form-title,.faq-titulo,.lista-cab h3,.cat-section-title{font-family:var(--display);font-weight:700;letter-spacing:-.01em}
+.stat-n,.metric-val,.paso-n,.marca-nombre,.nav-logo::after{font-family:var(--display);font-weight:800;letter-spacing:-.02em}
+.paso-n{letter-spacing:0}
+.lista-cant input{font-variant-numeric:tabular-nums}
