@@ -1,0 +1,241 @@
+/* ============================================================
+   TEMA DE MARCA RJM (se carga al final: manda sobre los estilos anteriores)
+   Colores tomados del logo: naranja → ámbar sobre azul marino.
+   ============================================================ */
+:root{
+  --marca1:#e2560b;          /* naranja del logo */
+  --marca2:#f59e0b;          /* ámbar */
+  --marca3:#fbbf24;          /* amarillo cálido */
+  --marino:#0b3a6e;          /* azul del recuadro "RJM" */
+  --degradado:linear-gradient(135deg,var(--marca1) 0%,var(--marca2) 55%,var(--marca3) 100%);
+  /* Reasignación del acento de toda la web */
+  --blue:#ea580c;
+  --blue-lite:#f97316;
+  --cyan:#fbbf24;
+  --accent:#f59e0b;
+  --border:rgba(251,146,60,.16);
+  --border2:rgba(251,146,60,.07);
+  --radio:16px;
+}
+
+/* ---------- Detalles generales ---------- */
+::selection{background:var(--marca2);color:#1a0d00}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-thumb{background:var(--degradado)}
+.tag{border-color:rgba(251,191,36,.35);border-radius:999px;padding:.35rem .95rem}
+.section-title{letter-spacing:-.02em}
+.section-title::after{content:'';display:block;width:64px;height:4px;margin-top:.9rem;border-radius:4px;background:var(--degradado)}
+
+/* ---------- Botones: más grandes, redondeados y con degradado ---------- */
+.btn,.btn-submit{border-radius:999px;min-height:50px;padding:.85rem 1.9rem;font-weight:600}
+.btn-primary,.btn-submit,.nav-cta{background:var(--degradado) !important;color:#1a0d00 !important;
+  box-shadow:0 8px 28px rgba(234,88,12,.35),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-primary:hover,.btn-submit:hover,.nav-cta:hover{filter:brightness(1.08);box-shadow:0 12px 36px rgba(234,88,12,.5)}
+.btn-ghost{border-radius:999px;box-shadow:0 0 0 1.5px rgba(251,191,36,.45)}
+.btn-ghost:hover{box-shadow:0 0 0 1.5px var(--marca3);background:rgba(251,191,36,.06)}
+.nav-cta{border-radius:999px;padding:.6rem 1.4rem}
+
+/* ---------- Menú superior con logo grande ---------- */
+#nav{height:80px;padding:0 1.6rem}
+#nav.scrolled{height:64px}
+.buscador{top:64px}
+.nav-logo img,.nav-logo picture img{width:60px !important;height:60px !important;border-radius:14px;
+  box-shadow:0 0 0 2px rgba(251,191,36,.55),0 6px 22px rgba(234,88,12,.45);transition:width .3s,height .3s,transform .3s}
+#nav.scrolled .nav-logo img{width:48px !important;height:48px !important}
+.nav-logo:hover img{transform:rotate(-4deg) scale(1.05)}
+.nav-logo::after{content:'RJM Import-Export';font-family:var(--display);font-weight:800;font-size:1.05rem;
+  background:var(--degradado);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.mobile-menu{top:80px}
+#nav.scrolled ~ .mobile-menu{top:64px}
+
+/* ---------- Portada ---------- */
+#hero{padding-top:80px;background:
+  radial-gradient(900px 600px at 85% 20%,rgba(234,88,12,.20),transparent 60%),
+  radial-gradient(700px 500px at 5% 90%,rgba(11,58,110,.55),transparent 65%),
+  var(--bg)}
+.hero-grid{background-image:linear-gradient(rgba(251,146,60,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(251,146,60,.05) 1px,transparent 1px)}
+.hero-glow{background:radial-gradient(circle,rgba(234,88,12,.22) 0%,transparent 70%);animation:aurora 14s ease-in-out infinite alternate}
+.hero-glow2{background:radial-gradient(circle,rgba(251,191,36,.12) 0%,transparent 70%);animation:aurora 18s ease-in-out infinite alternate-reverse}
+@keyframes aurora{from{transform:translate(0,0) scale(1)}to{transform:translate(-60px,40px) scale(1.15)}}
+#hero::before{background:radial-gradient(520px circle at var(--mx) var(--my),rgba(251,146,60,.14),transparent 60%)}
+.hero-title{font-size:clamp(2.5rem,6vw,4.6rem)}
+.hero-title .hl{background-image:linear-gradient(90deg,var(--marca1),var(--marca3),#fff3c4,var(--marca3),var(--marca1)) !important}
+
+/* Logo grande en la portada */
+.hero-logo{position:relative;width:min(260px,60%);aspect-ratio:1;margin:0 auto 2.2rem}
+.hero-logo img{position:relative;z-index:1;width:100%;height:100%;border-radius:32px;
+  box-shadow:0 30px 80px rgba(234,88,12,.45),0 0 0 3px rgba(251,191,36,.6)}
+.hero-logo::before{content:'';position:absolute;inset:-18px;border-radius:44px;z-index:0;
+  background:conic-gradient(from 0deg,var(--marca1),var(--marca3),var(--marino),var(--marca1));
+  filter:blur(22px);opacity:.7;animation:giro 8s linear infinite}
+@keyframes giro{to{transform:rotate(360deg)}}
+.hero-logo-movil{display:none}
+.hero-card-main{border-radius:var(--radio)}
+.hero-card-main::before{background:var(--degradado) !important;height:3px}
+.metric-val{background:var(--degradado);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.badge{border-radius:999px}
+
+/* Barra de estadísticas */
+.stat-n{background:var(--degradado);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+
+/* Cinta animada de categorías */
+.cinta{overflow:hidden;border-block:1px solid var(--border);background:linear-gradient(90deg,rgba(234,88,12,.10),rgba(11,58,110,.25),rgba(234,88,12,.10));
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.cinta-pista{display:flex;gap:2.6rem;width:max-content;padding:1rem 0;animation:cinta 38s linear infinite}
+.cinta:hover .cinta-pista{animation-play-state:paused}
+.cinta-pista span{font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--text2);white-space:nowrap;display:flex;align-items:center;gap:2.6rem}
+.cinta-pista span::after{content:'✦';color:var(--marca2);font-size:.8rem}
+@keyframes cinta{to{transform:translateX(-50%)}}
+
+/* ---------- Tarjetas ---------- */
+.product-card,.service-card,.paso,.contact-form,.about-main-card{border-radius:var(--radio);overflow:hidden}
+.product-card{border:1px solid var(--border);transition:transform .3s,box-shadow .3s,border-color .3s}
+.product-card:hover{border-color:rgba(251,146,60,.55);box-shadow:0 18px 50px rgba(0,0,0,.45),0 0 0 1px rgba(251,146,60,.25)}
+.product-img-ph{background:radial-gradient(circle at 50% 40%,rgba(234,88,12,.18),transparent 65%) !important}
+.product-badge{background:var(--degradado) !important;color:#1a0d00 !important;border-radius:999px;font-weight:600}
+.product-cat{color:var(--marca3) !important}
+.product-action{border-radius:999px;min-height:40px;display:inline-flex;align-items:center}
+.btn-lista{border-radius:999px;min-height:40px}
+.btn-lista.en-lista{background:var(--degradado);border-color:transparent;color:#1a0d00}
+.service-icon{width:58px;height:58px;display:grid;place-items:center;border-radius:16px;font-size:1.6rem;
+  background:linear-gradient(135deg,rgba(234,88,12,.25),rgba(251,191,36,.12));border:1px solid rgba(251,191,36,.35) !important}
+.service-card:hover{border-color:rgba(251,146,60,.5)}
+.paso-n{font-size:1.6rem;font-family:var(--display);font-weight:800;letter-spacing:0;
+  background:var(--degradado);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.chip{border-radius:999px}
+.chip.activo{background:var(--degradado) !important;color:#1a0d00 !important;border-color:transparent !important}
+.buscador-caja input{border-radius:999px}
+.f-group input,.f-group select,.f-group textarea{border-radius:12px}
+.contact-ico{border-radius:14px}
+.faq details{transition:background .3s}
+.faq details[open]{background:rgba(251,146,60,.04)}
+
+/* Botones flotantes */
+.lista-fab{border-radius:999px;border-color:var(--marca2)}
+.arriba{border-radius:50%}
+#progreso{background:var(--degradado);height:3px}
+
+/* ---------- Barra inferior para celular ---------- */
+.barra-movil{display:none}
+@media(max-width:700px){
+  #nav{height:68px;padding:0 1rem}
+  #nav.scrolled{height:60px}
+  .nav-logo img,.nav-logo picture img{width:52px !important;height:52px !important}
+  #nav.scrolled .nav-logo img{width:44px !important;height:44px !important}
+  .nav-logo::after{font-size:.95rem}
+  .nav-toggle{padding:.8rem}
+  .mobile-menu{top:68px}
+  .mobile-menu a{padding:1.1rem 1.5rem;font-size:1rem}
+  #hero{padding-top:68px;min-height:auto}
+  .hero-inner{padding:2rem 1.25rem 3rem}
+  .hero-logo-movil{display:block;width:150px;margin:0 auto 1.6rem}
+  .hero-logo-movil::before{inset:-12px;filter:blur(16px)}
+  .hero-content{text-align:center}
+  .hero-eyebrow{justify-content:center}
+  .hero-eyebrow::before{display:none}
+  .hero-desc{margin-left:auto;margin-right:auto}
+  .hero-actions{flex-direction:column;align-items:stretch}
+  .hero-actions .btn{justify-content:center;width:100%}
+  .container{padding:0 1.25rem}
+  .buscador{margin-left:-1.25rem;margin-right:-1.25rem;padding:.8rem 1.25rem;top:60px}
+  .about-accent{right:-.5rem}
+  .products-grid{gap:.9rem}
+  /* Sin botones flotantes sueltos: todo va en la barra inferior */
+  .wa-float,.lista-fab,.arriba{display:none !important}
+  body{padding-bottom:76px}
+  .aviso{bottom:5.6rem !important}
+  .barra-movil{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:950;
+    background:rgba(10,14,22,.96);backdrop-filter:blur(14px);border-top:1px solid var(--border);
+    padding:.35rem .4rem calc(.35rem + env(safe-area-inset-bottom))}
+  .barra-movil a,.barra-movil button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.15rem;
+    min-height:58px;background:none;border:none;color:var(--text2);font-family:var(--sans);font-size:.68rem;letter-spacing:.02em;
+    border-radius:14px;cursor:pointer;position:relative;-webkit-tap-highlight-color:transparent}
+  .barra-movil .ico{font-size:1.35rem;line-height:1}
+  .barra-movil a:active,.barra-movil button:active{background:rgba(251,146,60,.12)}
+  .barra-movil .wa{color:#fff;background:linear-gradient(135deg,#16a34a,#22c55e);margin:0 .2rem;box-shadow:0 6px 18px rgba(34,197,94,.35)}
+  .barra-movil .cuenta-movil{position:absolute;top:6px;right:calc(50% - 22px);min-width:18px;height:18px;padding:0 4px;border-radius:999px;
+    background:var(--degradado);color:#1a0d00;font-size:.65rem;font-weight:700;display:grid;place-items:center}
+  .barra-movil .cuenta-movil[hidden]{display:none}
+}
+
+@media(prefers-reduced-motion:reduce){
+  .hero-logo::before,.hero-glow,.hero-glow2,.cinta-pista{animation:none}
+}
+
+/* ---------- Nuestras marcas ---------- */
+#marcas{background:linear-gradient(180deg,var(--bg),rgba(11,58,110,.18) 50%,var(--bg))}
+.marcas-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;margin-top:2.5rem}
+.marca-card{position:relative;border-radius:var(--radio);padding:2rem 1.2rem 1.2rem;min-height:170px;
+  display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center;
+  background:var(--surface);border:1px solid var(--border);overflow:hidden;cursor:pointer;
+  transition:transform .3s,border-color .3s,box-shadow .3s}
+.marca-card::before{content:'';position:absolute;inset:0;opacity:0;transition:opacity .35s;
+  background:radial-gradient(260px circle at 50% 0%,rgba(234,88,12,.28),transparent 70%)}
+.marca-card:hover,.marca-card:focus-within{transform:translateY(-6px);border-color:rgba(251,146,60,.6);box-shadow:0 18px 44px rgba(0,0,0,.45)}
+.marca-card:hover::before,.marca-card:focus-within::before{opacity:1}
+.marca-nombre{position:relative;font-family:var(--display);font-weight:800;font-size:clamp(1.25rem,2vw,1.6rem);
+  letter-spacing:-.01em;color:var(--white);transition:color .3s}
+.marca-card:hover .marca-nombre{background:var(--degradado);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.marca-acciones{position:relative;display:flex;gap:.5rem;width:100%;margin-top:1.4rem}
+.marca-ver{flex:1;min-height:42px;border-radius:999px;border:1px solid rgba(251,191,36,.45);background:transparent;
+  color:var(--marca3);font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:background .2s,color .2s}
+.marca-ver:hover{background:var(--degradado);color:#1a0d00;border-color:transparent}
+.marca-wa{width:42px;height:42px;flex:none;display:grid;place-items:center;border-radius:50%;background:#22c55e;font-size:1.05rem}
+.marca-wa:hover{filter:brightness(1.1)}
+@media(max-width:1000px){.marcas-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){
+  .marcas-grid{grid-template-columns:1fr 1fr;gap:.8rem}
+  .marca-card{min-height:150px;padding:1.5rem .9rem 1rem}
+}
+.marca-mas{border-style:dashed;border-color:rgba(251,191,36,.4)}
+.marca-mas .marca-nombre{font-size:1.15rem;color:var(--marca3)}
+.marca-nota{position:relative;font-size:.78rem;line-height:1.5;margin-top:.5rem}
+a.marca-ver{display:flex;align-items:center;justify-content:center;gap:.3rem}
+/* Pantallas medianas: el menú necesita espacio */
+@media(min-width:901px) and (max-width:1180px){
+  .nav-logo::after{display:none}
+  .nav-links{gap:1.2rem}
+  .nav-links a{font-size:.74rem}
+}
+.marca-logo{position:relative;display:flex;flex-direction:column;align-items:center;gap:.3rem}
+.marca-sub{font-family:var(--mono);font-size:.66rem;letter-spacing:.3em;text-transform:uppercase;color:var(--text)}
+.marca-card{min-height:190px}
+.marca-nombre{font-size:clamp(1.35rem,2.4vw,2rem)}
+@media(min-width:1001px){.marca-acciones{max-width:280px}}
+
+/* Marcas: acabado fino */
+.marca-card{background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,0) 40%),var(--surface)}
+.marca-card::after{content:'';position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;opacity:0;transition:opacity .35s;
+  background:linear-gradient(135deg,var(--marca1),var(--marca3) 50%,transparent 80%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.marca-card:hover::after,.marca-card:focus-within::after{opacity:1}
+.marca-sub{display:flex;align-items:center;gap:.6rem}
+.marca-sub::before,.marca-sub::after{content:'';width:18px;height:1px;background:currentColor;opacity:.6}
+.marca-wa{color:#fff;box-shadow:0 6px 16px rgba(34,197,94,.3)}
+/* Logos oficiales (cuando se agreguen como imagen): blanco uniforme sobre fondo oscuro */
+.marca-logo img{max-width:82%;max-height:64px;object-fit:contain;filter:brightness(0) invert(1);opacity:.92;transition:opacity .3s,transform .3s}
+.marca-card:hover .marca-logo img{opacity:1;transform:scale(1.04)}
+.marca-sub{white-space:nowrap;letter-spacing:.2em;font-size:.62rem}
+@media(max-width:600px){.marca-sub{letter-spacing:.12em;font-size:.56rem}.marca-sub::before,.marca-sub::after{width:10px}}
+
+/* ============================================================
+   TIPOGRAFÍA (Plus Jakarta Sans + Inter): legible en PC y celular
+   ============================================================ */
+body{font-weight:400;font-size:16px;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,.hero-title,.section-title{font-family:var(--display);font-weight:800;letter-spacing:-.03em}
+.hero-title{line-height:1.04}
+.section-title{line-height:1.12}
+.section-sub,.hero-desc{font-size:1.02rem;line-height:1.7;color:#a9bfd6}
+/* Etiquetas en mayúsculas: menos separación entre letras y más peso = se leen mejor */
+.tag,.nav-logo-badge,.hero-eyebrow,.hero-card-label,.metric-label,.badge,.stat-l,.product-img-ph span,
+.product-badge,.product-cat,.product-action,.about-card-footer-label,.contact-label,.f-group label,
+.footer-col h4,.dyn-filtro,.product-price small,.chip,.buscador-info,.btn-lista,.lista-fab,.lista-enviar,
+.marca-ver,.marca-sub{letter-spacing:.08em;font-weight:600}
+.hero-eyebrow{letter-spacing:.14em}
+.service-features li,.footer-legal{letter-spacing:.01em}
+.nav-links a{font-weight:500;letter-spacing:.04em}
+.btn,.btn-submit,.nav-cta{font-weight:700;letter-spacing:.04em}
+.product-name,.service-name,.form-title,.faq-titulo,.lista-cab h3,.cat-section-title{font-family:var(--display);font-weight:700;letter-spacing:-.01em}
+.stat-n,.metric-val,.paso-n,.marca-nombre,.nav-logo::after{font-family:var(--display);font-weight:800;letter-spacing:-.02em}
+.paso-n{letter-spacing:0}
+.lista-cant input{font-variant-numeric:tabular-nums}
