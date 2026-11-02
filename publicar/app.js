@@ -228,7 +228,7 @@
     $('previaImg').innerHTML = fotoUrl ? `<img src="${fotoUrl}" alt=""/>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>';
     $('previaCat').textContent = [d.categoria, d.marca].filter(Boolean).join(' · ');
     $('previaNom').textContent = d.nombre;
-    $('previaPrecio').innerHTML = d.precio != null ? esc(precio(d.precio, 'PEN')) + '<small>INC. IGV</small>' : 'Precio a consultar';
+    $('previaPrecio').innerHTML = d.precio != null ? esc(precio(d.precio, 'PEN')) + '<small>IGV incluido</small>' : '<span class="consultar">Precio a consultar</span>';
   }
 
   // ---------- Publicar ----------

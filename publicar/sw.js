@@ -3,7 +3,7 @@
 // - Siempre intenta primero la red (así ves la última versión) y usa la copia
 //   guardada solo si no hay conexión.
 // - Nunca guarda las llamadas a la base de datos (Supabase): pasan directo.
-const VERSION = 'rjm-publicar-v1';
+const VERSION = 'rjm-publicar-v2';
 const CARCASA = [
   './', './index.html', './app.css', './app.js', './manifest.webmanifest', './icon-192.png',
   '../css/fuentes.css', '../fonts/inter-latin-wght-normal.woff2', '../fonts/plus-jakarta-sans-latin-wght-normal.woff2',
