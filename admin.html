@@ -114,7 +114,7 @@
     <div class="campo"><label for="pDesc">Descripción</label><textarea id="pDesc" maxlength="2000"></textarea></div>
     <div class="campo"><label for="pCarac">Características (una por línea)</label><textarea id="pCarac" placeholder="Material: acero&#10;Calibre: 10-46&#10;Compatible con guitarra eléctrica"></textarea></div>
     <div class="fila">
-      <div class="campo"><label for="pPrecio">Precio</label><input id="pPrecio" type="number" min="0" step="0.01" placeholder="vacío = consultar"/></div>
+      <div class="campo"><label for="pPrecio">Precio (IGV incluido)</label><input id="pPrecio" type="number" min="0" step="0.01" placeholder="vacío = consultar"/></div>
       <div class="campo"><label for="pMoneda">Moneda</label><select id="pMoneda"><option value="PEN">Soles (S/)</option><option value="USD">Dólares (US$)</option></select></div>
       <div class="campo"><label for="pOrden">Orden</label><input id="pOrden" type="number" step="1" value="0"/></div>
     </div>
@@ -124,7 +124,6 @@
       <img id="pFotoPrev" class="foto-prev oculto" alt="Vista previa"/>
     </div>
     <div class="fila">
-      <label class="check"><input type="checkbox" id="pIgv" checked/> Precio incluye IGV</label>
       <label class="check"><input type="checkbox" id="pPublicado" checked/> Visible en la web</label>
       <label class="check"><input type="checkbox" id="pDestacado"/> Destacado</label>
     </div>
@@ -162,7 +161,6 @@
     </div>
     <div class="campo"><label for="mNotas">Notas para el mayorista</label><input id="mNotas" maxlength="200"/></div>
     <div class="fila">
-      <label class="check"><input type="checkbox" id="mIgv" checked/> Precios incluyen IGV</label>
       <label class="check"><input type="checkbox" id="mMostrarStock" checked/> Mostrar cantidad en stock</label>
       <label class="check"><input type="checkbox" id="mActivo" checked/> Activo</label>
     </div>
