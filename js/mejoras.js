@@ -38,7 +38,7 @@
       enlaces.forEach(a => a.classList.toggle('activo', a.getAttribute('href') === '#' + e.target.id));
     });
   }, { rootMargin: '-45% 0px -50% 0px' });
-  ['hero', 'productos', 'servicios', 'sobre', 'comprar', 'contacto'].forEach(id => { const s = document.getElementById(id); if (s) vigia.observe(s); });
+  ['hero', 'productos', 'marcas', 'servicios', 'sobre', 'comprar', 'contacto'].forEach(id => { const s = document.getElementById(id); if (s) vigia.observe(s); });
 
   // ---------- Contadores animados (300+, 24h, 100%...) ----------
   function contar(el) {
