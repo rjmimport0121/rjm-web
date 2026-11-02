@@ -78,6 +78,7 @@
           </div>`);
         card = tarjetaDeSubgrupo(sg.nombre);
       }
+      card.dataset.buscar = sg.items.map(p => [p.nombre, p.marca, p.sku].filter(Boolean).join(' ')).join(' ');
       const info = card.querySelector('.product-info');
       info.querySelector('.ver-sub')?.remove();
       info.insertAdjacentHTML('beforeend', botonVer(sg));
@@ -165,6 +166,7 @@
       $('dynGrid').innerHTML = arriba.map(tarjeta).join('');
       $('catalogoDinamico').hidden = false;
     }
+    document.dispatchEvent(new Event('rjm:catalogo'));
     abrirDesdeHash();
     window.addEventListener('hashchange', abrirDesdeHash);
   })();
