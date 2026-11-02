@@ -139,7 +139,6 @@
     $('pPrecio').value = p?.precio ?? '';
     $('pMoneda').value = p?.moneda || 'PEN';
     $('pOrden').value = p?.orden ?? 0;
-    $('pIgv').checked = p ? p.precio_incluye_igv : true;
     $('pPublicado').checked = p ? p.publicado : true;
     $('pDestacado').checked = p ? p.destacado : false;
     $('pFoto').value = '';
@@ -189,7 +188,7 @@
         precio: $('pPrecio').value === '' ? null : Number($('pPrecio').value),
         moneda: $('pMoneda').value,
         orden: Number($('pOrden').value) || 0,
-        precio_incluye_igv: $('pIgv').checked,
+        precio_incluye_igv: true, // todos los precios se registran con IGV incluido
         publicado: $('pPublicado').checked,
         destacado: $('pDestacado').checked,
       };
@@ -251,7 +250,7 @@
     div.className = 'tramo';
     div.innerHTML = `
       <div><label>Desde (cantidad)</label><input type="number" min="1" step="1" class="tCant" value="${esc(cant)}" required></div>
-      <div><label>Precio unitario</label><input type="number" min="0" step="0.01" class="tPrecio" value="${esc(prec)}" required></div>
+      <div><label>Precio unitario (inc. IGV)</label><input type="number" min="0" step="0.01" class="tPrecio" value="${esc(prec)}" required></div>
       <button type="button" class="btn peligro chico" title="Quitar">✕</button>`;
     div.querySelector('button').addEventListener('click', () => div.remove());
     $('tramos').appendChild(div);
@@ -270,7 +269,6 @@
     $('mMoneda').value = p?.moneda || 'PEN';
     $('mOrden').value = p?.orden ?? 0;
     $('mNotas').value = p?.notas || '';
-    $('mIgv').checked = p ? p.precio_incluye_igv : true;
     $('mMostrarStock').checked = p ? p.mostrar_stock : true;
     $('mActivo').checked = p ? p.activo : true;
     $('tramos').innerHTML = '';
@@ -303,7 +301,7 @@
         moneda: $('mMoneda').value,
         orden: Number($('mOrden').value) || 0,
         notas: $('mNotas').value.trim() || null,
-        precio_incluye_igv: $('mIgv').checked,
+        precio_incluye_igv: true, // todos los precios se registran con IGV incluido
         mostrar_stock: $('mMostrarStock').checked,
         activo: $('mActivo').checked,
       };

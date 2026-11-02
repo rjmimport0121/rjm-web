@@ -51,8 +51,7 @@
     lista = data.map(x => ({ ...x, tramos: (x.precios_mayoristas || []).sort((a, b) => a.cantidad_minima - b.cantidad_minima) }));
     const ult = lista.reduce((m, x) => (x.actualizado_en > m ? x.actualizado_en : m), '');
     $('actualizado').textContent = ult ? 'Actualizado: ' + new Date(ult).toLocaleDateString('es-PE') : '';
-    const todosIgv = lista.every(x => x.precio_incluye_igv), ningunoIgv = lista.every(x => !x.precio_incluye_igv);
-    $('notaIgv').textContent = todosIgv ? 'Precios incluyen IGV' : ningunoIgv ? 'Precios no incluyen IGV' : 'Ver IGV en cada producto';
+    $('notaIgv').textContent = 'Todos los precios incluyen IGV';
     pintar();
   }
 
@@ -74,7 +73,7 @@
         <td><b>${esc(x.nombre)}</b>${x.categoria ? `<br><small>${esc(x.categoria)}</small>` : ''}${x.notas ? `<br><small>${esc(x.notas)}</small>` : ''}</td>
         <td class="num">${x.mostrar_stock ? `${x.stock} ${esc(x.unidad)}` : 'Disponible'}</td>
         <td class="tramos-txt">${x.tramos.map(t => `Desde ${t.cantidad_minima} ${esc(x.unidad)}: <b>${precio(t.precio, x.moneda)}</b>`).join('<br>') || 'Consultar'}
-          ${x.precio_incluye_igv ? '' : '<br><small>+ IGV</small>'}</td>
+</td>
         <td class="num"><input class="cant" type="number" min="0" ${x.mostrar_stock ? `max="${x.stock}"` : ''} step="1" data-id="${x.id}" value="${c}" aria-label="Cantidad"></td>
         <td class="num">${pu != null ? precio(pu * c, x.moneda) : (c ? '<small>Mín. ' + (x.tramos[0]?.cantidad_minima ?? '') + '</small>' : '')}</td>
       </tr>`;
@@ -103,18 +102,38 @@
     pintar();
   });
 
-  $('btnPedido').addEventListener('click', () => {
-    let txt = `Hola RJM! Pedido mayorista de *${perfil.nombre || perfil.usuario}* (usuario: ${perfil.usuario}${perfil.ruc ? ', RUC/DNI ' + perfil.ruc : ''}):\n`;
+  // Pedido -> proforma por WhatsApp (precios con IGV incluido).
+  function proforma() {
+    const ahora = new Date();
+    const dos = n => String(n).padStart(2, '0');
+    const numero = `PM-${String(ahora.getFullYear()).slice(2)}${dos(ahora.getMonth() + 1)}${dos(ahora.getDate())}-${dos(ahora.getHours())}${dos(ahora.getMinutes())}`;
+    const items = [];
     const porMoneda = {};
     for (const x of lista) {
       const c = cantidades[x.id]; if (!c) continue;
       const pu = precioPara(x, c); if (pu == null) continue;
-      porMoneda[x.moneda] = (porMoneda[x.moneda] || 0) + pu * c;
-      txt += `\n• ${c} ${x.unidad} × ${x.nombre}${x.sku ? ' [' + x.sku + ']' : ''} @ ${precio(pu, x.moneda)} = ${precio(pu * c, x.moneda)}`;
+      const importe = Math.round(pu * c * 100) / 100;
+      porMoneda[x.moneda] = (porMoneda[x.moneda] || 0) + importe;
+      items.push({ x, c, pu, importe });
     }
-    txt += `\n\nTotal estimado: ${Object.entries(porMoneda).map(([m, v]) => precio(v, m)).join(' + ')}`;
-    txt += '\nQuedo atento a la confirmación de stock y forma de pago.';
-    window.open(RJM.waLink(txt), '_blank', 'noopener');
+    const linea = '------------------------------';
+    let t = `*PROFORMA N° ${numero}*\nRJM Import-Export E.I.R.L.\nFecha: ${ahora.toLocaleDateString('es-PE')}\n${linea}\n`;
+    t += `*Cliente:* ${perfil.nombre || perfil.usuario}\n`;
+    if (perfil.ruc) t += `*RUC/DNI:* ${perfil.ruc}\n`;
+    if (perfil.telefono) t += `*Teléfono:* ${perfil.telefono}\n`;
+    t += `*Usuario:* ${perfil.usuario}\n${linea}\n`;
+    items.forEach(({ x, c, pu, importe }, n) => {
+      t += `${n + 1}) ${x.nombre}\n`;
+      if (x.sku) t += `   Cód. ${x.sku}\n`;
+      t += `   ${c} ${x.unidad} x ${precio(pu, x.moneda)} = ${precio(importe, x.moneda)}\n`;
+    });
+    t += `${linea}\n*TOTAL (IGV incluido): ${Object.entries(porMoneda).map(([m, v]) => precio(v, m)).join(' + ')}*\n`;
+    t += `${linea}\nPrecios con IGV incluido.\nSujeto a confirmación de stock.`;
+    return t;
+  }
+
+  $('btnPedido').addEventListener('click', () => {
+    window.open(RJM.waLink(proforma()), '_blank', 'noopener');
   });
 
   iniciar();

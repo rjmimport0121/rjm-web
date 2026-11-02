@@ -13,7 +13,7 @@
   function mensajeWa(p) {
     let t = `Hola RJM! Me interesa este producto:\n\n*${p.nombre}*`;
     if (p.sku) t += `\nCódigo: ${p.sku}`;
-    if (p.precio != null) t += `\nPrecio: ${precio(p.precio, p.moneda)}${p.precio_incluye_igv ? ' (inc. IGV)' : ' + IGV'}`;
+    if (p.precio != null) t += `\nPrecio: ${precio(p.precio, p.moneda)} (inc. IGV)`;
     t += `\n\nVer producto: ${cfg.SITIO_URL}#producto=${p.id}`;
     if (p.foto_url) t += `\nFoto: ${p.foto_url}`;
     t += `\n\n¿Tienen disponibilidad?`;
@@ -22,7 +22,7 @@
 
   function htmlPrecio(p) {
     if (p.precio == null) return '<div class="product-price">Precio a consultar</div>';
-    return `<div class="product-price">${precio(p.precio, p.moneda)}<small>${p.precio_incluye_igv ? 'INC. IGV' : '+ IGV'}</small></div>`;
+    return `<div class="product-price">${precio(p.precio, p.moneda)}<small>INC. IGV</small></div>`;
   }
 
   function tarjeta(p) {
