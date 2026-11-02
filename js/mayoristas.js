@@ -107,7 +107,8 @@
   const EMPRESA = {
     nombre: 'RJM Import-Export E.I.R.L.',
     ruc: '20610045171',
-    lineas: ['RUC 20610045171', 'Asoc. Basilio Auqui Mz. G Lt. 6, Ayacucho, Perú', 'WhatsApp: +51 956 543 522', 'rjm.import.export@gmail.com', 'www.rjmimport.com'],
+    banco: 'BCP Soles N° 2207106419030 · CCI 00222000710641903020',
+    lineas: ['RUC 20610045171', 'Mz. G Lt. 06 Asc. Basilio Auqui, Huamanga - Ayacucho', 'WhatsApp: +51 956 543 522', 'rjm.import.export@gmail.com', 'www.rjmimport.com'],
   };
 
   function datosProforma() {
@@ -139,7 +140,7 @@
       t += `   ${c} ${x.unidad} x ${precio(pu, x.moneda)} = ${precio(importe, x.moneda)}\n`;
     });
     t += `${linea}\n*TOTAL (IGV incluido): ${d.total}*\n`;
-    t += `${linea}\nPrecios con IGV incluido.\nSujeto a confirmación de stock.`;
+    t += `${linea}\nPrecios con IGV incluido.\nSujeto a confirmación de stock.\n*Pago:* ${EMPRESA.banco}`;
     return t;
   }
 
@@ -224,6 +225,9 @@
     doc.setTextColor(...gris); doc.setFont('helvetica', 'normal'); doc.setFontSize(8.5);
     ['Precios con IGV incluido.', 'Sujeto a confirmación de stock.', 'Documento informativo: no es un comprobante de pago.']
       .forEach((l, n) => doc.text('• ' + l, m, y + 14 + n * 4.5));
+    doc.setFont('helvetica', 'bold'); doc.setTextColor(20); doc.setFontSize(9);
+    doc.text('Cuenta para el pago:', m, y + 32);
+    doc.setFont('helvetica', 'normal'); doc.text(EMPRESA.banco, m + 34, y + 32);
 
     const nombre = `Proforma-${d.numero}.pdf`;
     return new File([doc.output('blob')], nombre, { type: 'application/pdf' });
