@@ -49,6 +49,14 @@ Así nadie puede crearse una cuenta por su cuenta. Solo tú creas los accesos. A
    La clave `anon` es pública por diseño, porque la protección la dan las reglas RLS. **Nunca** pongas la clave `service_role` en la web.
 3. Sube el cambio a GitHub. Cloudflare (proyecto `rjm-web`) lo publicará.
 
+### 7. (Opcional) Cargar datos de prueba
+Para probar todo sin cargar productos reales:
+1. **Authentication → Users → Add user → Create new user**: correo `prueba@mayoristas.rjmimport.com`, la contraseña de prueba y **Auto Confirm User** marcado.
+2. **SQL Editor → New query**: pega `supabase/datos-prueba.sql` y pulsa **Run**. Al final debe mostrar `12 | 12 | 36 | 1`.
+3. Entra al portal mayorista con el usuario **`prueba`** y esa contraseña.
+
+Los productos de prueba tienen el SKU `DEMO-...` y se editan como cualquier otro en `admin.html`. Los del catálogo web quedan **ocultos** para que ningún cliente vea precios de prueba. Al final del script hay instrucciones para publicarlos o borrarlos.
+
 ## Uso diario
 - **Administración:** `https://www.rjmimport.com/admin.html` (también hay un enlace discreto en el pie de página).
 - **Mayoristas:** `https://www.rjmimport.com/mayoristas.html` (enlace "Mayoristas" en el menú).
