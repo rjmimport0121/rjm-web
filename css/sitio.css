@@ -550,7 +550,7 @@ ul,ol{margin:0;padding:0;list-style:none}
 @media(min-width:1080px){body{padding-bottom:0}.barra-movil{display:none}.wa-flotante{display:grid}}
 
 /* ---------- Aviso breve ---------- */
-.aviso{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:14px;max-width:calc(100vw - 32px);
+.aviso{position:fixed;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:14px;width:max-content;max-width:calc(100vw - 32px);
   padding:12px 14px 12px 16px;border-radius:12px;background:var(--tinta);color:#fff;font-weight:600;font-size:14.5px;box-shadow:var(--sombra-3);
   opacity:0;pointer-events:none;transform:translate(-50%,16px);transition:opacity .25s,transform .25s var(--ease)}
 .aviso.visible{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
@@ -762,3 +762,9 @@ html.lenis,html.lenis body{height:auto}
   .caja-blanca{border:0;padding:0}
   .constancia-ic{display:none}
 }
+
+/* Redes sociales (pie de página) */
+.redes{display:flex;gap:10px}
+.redes a{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.08);color:#fff;transition:background-color .2s,transform .2s}
+.redes a:hover{background:var(--naranja);transform:translateY(-2px)}
+.redes .ic{width:22px;height:22px}

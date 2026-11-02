@@ -611,6 +611,28 @@
     window.RJM_AVISO('Abriendo WhatsApp con tu consulta…');
   });
 
+  // ---------- Redes sociales y segundo WhatsApp (se configuran en js/config.js) ----------
+  (function redes() {
+    const NOMBRES = { facebook: 'Facebook', instagram: 'Instagram', tiktok: 'TikTok' };
+    const enlaces = Object.entries(cfg.REDES || {}).filter(([k, url]) => NOMBRES[k] && /^https:\/\/[^\s"'<>]+$/.test(String(url || '')));
+    if (enlaces.length) {
+      $('redes').innerHTML = enlaces.map(([k, url]) => `<li><a href="${esc(url)}" target="_blank" rel="noopener me" aria-label="RJM en ${NOMBRES[k]}">${icono(k)}</a></li>`).join('');
+      $('redes').hidden = false;
+      const ld = document.createElement('script');
+      ld.type = 'application/ld+json';
+      ld.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'RJM Import-Export EIRL', url: SITIO, sameAs: enlaces.map(([, url]) => url) });
+      document.head.appendChild(ld);
+    }
+    const wa2 = String(cfg.WHATSAPP_2 || '').replace(/\D/g, '');
+    if (wa2.length >= 9) {
+      const legible = wa2.length === 11 && wa2.startsWith('51') ? `+51 ${wa2.slice(2, 5)} ${wa2.slice(5, 8)} ${wa2.slice(8)}` : '+' + wa2;
+      $('datoWa2Nombre').textContent = cfg.WHATSAPP_2_NOMBRE || 'WhatsApp Business';
+      $('datoWa2Enlace').href = `https://wa.me/${wa2}`;
+      $('datoWa2Enlace').textContent = legible;
+      $('datoWa2').hidden = false;
+    }
+  })();
+
   // ---------- Detalles ----------
   $('anio').textContent = new Date().getFullYear();
   document.querySelectorAll('.faq-wa[data-texto]').forEach(a => { a.href = waLink(a.dataset.texto); });

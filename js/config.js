@@ -10,5 +10,12 @@ window.RJM_CONFIG = {
   SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpkbHVyaGRuc2d0bGxnZmhpeGljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM1ODY2NDcsImV4cCI6MjEwOTE2MjY0N30.13BCHmOsh7HH4m6G5MBtq5WxGa3DdRMHJP23F8_XDBM',
   WHATSAPP: '51956543522', // número que recibe las consultas (código país + número)
   SITIO_URL: 'https://www.rjmimport.com/',
-  DOMINIO_USUARIOS: 'mayoristas.rjmimport.com' // debe coincidir con la Edge Function
+  DOMINIO_USUARIOS: 'mayoristas.rjmimport.com', // debe coincidir con la Edge Function
+  // Redes sociales: pega el enlace completo de cada perfil (https://...).
+  // Las que queden vacías no se muestran en la web.
+  REDES: { facebook: '', instagram: '', tiktok: '' },
+  // Segundo número de WhatsApp (por ejemplo, WhatsApp Business), con código de país: '51999888777'.
+  // Vacío = no se muestra.
+  WHATSAPP_2: '',
+  WHATSAPP_2_NOMBRE: 'WhatsApp Business'
 };
