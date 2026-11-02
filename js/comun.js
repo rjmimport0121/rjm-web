@@ -6,7 +6,7 @@
   // Cada área guarda su propia sesión: entrar al panel de administración NO abre
   // el portal de clientes (y al revés). La web pública no usa sesión.
   const ruta = location.pathname.toLowerCase();
-  const area = ruta.includes('admin') ? 'admin' : ruta.includes('mayorista') ? 'portal' : 'web';
+  const area = ruta.includes('admin') ? 'admin' : ruta.includes('mayorista') ? 'portal' : ruta.includes('publicar') ? 'app' : 'web';
   const opciones = { auth: { storageKey: 'rjm-sesion-' + area, persistSession: area !== 'web', autoRefreshToken: area !== 'web' } };
   // Limpia la sesión antigua, que antes compartían el panel y el portal.
   try { localStorage.removeItem('sb-' + new URL(cfg.SUPABASE_URL).hostname.split('.')[0] + '-auth-token'); } catch (_) {}

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es" class="sin-animacion">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="robots" content="noindex, nofollow"/>
+<meta name="theme-color" content="#070b12"/>
+<title>RJM Publicar</title>
+<link rel="manifest" href="manifest.webmanifest"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="preload" href="../fonts/plus-jakarta-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="preload" href="../fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin/>
+<link rel="stylesheet" href="../css/fuentes.css"/>
+<link rel="stylesheet" href="app.css"/>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ INGRESO ============ -->
+  <main class="vista" id="vIngreso" hidden>
+    <div class="ingreso">
+      <img class="ingreso-logo" src="icon-192.png" alt="RJM Import-Export" width="88" height="88"/>
+      <h1>RJM Publicar</h1>
+      <p class="tenue">Publica productos en tu web desde el celular. Solo para el administrador.</p>
+      <div id="msgIngreso" role="alert"></div>
+      <form id="formIngreso" autocomplete="on">
+        <div class="campo"><label for="iCorreo">Correo</label>
+          <input id="iCorreo" type="email" inputmode="email" autocomplete="username" required placeholder="Tu correo de administrador"/></div>
+        <div class="campo"><label for="iClave">Contraseña</label>
+          <input id="iClave" type="password" autocomplete="current-password" required/></div>
+        <button class="btn btn-principal" id="btnIngresar">Ingresar</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- ============ BARRA SUPERIOR ============ -->
+  <header class="barra" id="barra" hidden>
+    <button class="icono-btn" id="btnAtras" type="button" aria-label="Atrás" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <img class="barra-logo" id="barraLogo" src="icon-192.png" alt="" width="34" height="34"/>
+    <div class="barra-titulo"><h1 id="tituloVista">RJM Publicar</h1><small id="subtituloVista"></small></div>
+    <button class="icono-btn" id="btnMenu" type="button" aria-label="Más opciones" aria-haspopup="true" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></svg></button>
+    <div class="menu" id="menu" hidden>
+      <a href="../" target="_blank" rel="noopener">Ver la web</a>
+      <a href="../admin.html" target="_blank" rel="noopener">Panel de administración</a>
+      <button type="button" id="btnSalir">Cerrar sesión</button>
+    </div>
+  </header>
+  <div class="pasos" id="pasos" hidden aria-hidden="true"><i></i><i></i><i></i></div>
+
+  <main class="contenido" id="principal" hidden>
+    <!-- ============ INICIO ============ -->
+    <section class="vista" id="vInicio" hidden>
+      <p class="saludo">Hola, <b id="nombreAdmin">Rafa</b></p>
+      <button class="nuevo" type="button" id="btnNuevo">
+        <span class="nuevo-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></span>
+        <span><b>Nuevo producto</b><small>Foto, precio y listo</small></span>
+      </button>
+      <button class="instalar" type="button" id="btnInstalar" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14"/></svg>Instalar la app en este teléfono</button>
+      <div class="seccion-cab"><h2>Últimas publicaciones</h2><a href="../admin.html" target="_blank" rel="noopener">Editar en el panel</a></div>
+      <ul class="recientes" id="recientes"><li class="vacio">Cargando…</li></ul>
+    </section>
+
+    <!-- ============ 1 · FOTO ============ -->
+    <section class="vista" id="vFoto" hidden>
+      <div class="foto" id="fotoCaja">
+        <div class="foto-vacia" id="fotoVacia">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>
+          <span>Toma la foto con buena luz y el producto centrado.</span>
+        </div>
+        <img id="fotoVista" alt="Foto del producto" hidden/>
+      </div>
+      <div class="dos-btn">
+        <label class="btn btn-principal archivo" for="fCamara">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Tomar foto
+          <input id="fCamara" type="file" accept="image/*" capture="environment"/></label>
+        <label class="btn btn-sec archivo" for="fGaleria">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg>Galería
+          <input id="fGaleria" type="file" accept="image/*"/></label>
+      </div>
+      <p class="tenue centro">La foto se reduce sola para que cargue rápido en la web.</p>
+    </section>
+
+    <!-- ============ 2 · DATOS ============ -->
+    <section class="vista" id="vDatos" hidden>
+      <form id="formDatos" novalidate>
+        <div class="campo"><label for="dNombre">Nombre del producto *</label>
+          <input id="dNombre" maxlength="140" required placeholder="Ej: Preamplificador EQ 4 bandas con afinador" autocomplete="off"/>
+          <small class="error" id="eNombre"></small></div>
+        <div class="fila2">
+          <div class="campo"><label for="dPrecio">Precio S/ (IGV incluido)</label>
+            <input id="dPrecio" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Vacío = a consultar"/></div>
+          <div class="campo"><label for="dSku">Código (opcional)</label>
+            <input id="dSku" maxlength="60" autocomplete="off" placeholder="Ej: PRE-0045"/></div>
+        </div>
+        <div class="campo"><label for="dGrupo">Grupo *</label><select id="dGrupo" required></select></div>
+        <div class="campo"><label for="dSub">Subgrupo *</label><select id="dSub" required></select>
+          <input id="dSubOtro" maxlength="60" placeholder="Nombre del subgrupo nuevo" hidden/>
+          <small class="error" id="eSub"></small></div>
+        <div class="campo"><label for="dMarca">Marca</label><select id="dMarca"></select>
+          <input id="dMarcaOtra" maxlength="60" placeholder="Escribe la marca" hidden/></div>
+        <div class="campo"><label for="dDesc">Descripción</label>
+          <textarea id="dDesc" maxlength="2000" rows="4" placeholder="Para qué sirve, materiales, compatibilidad…"></textarea>
+          <div class="chips" aria-label="Frases rápidas">
+            <button type="button" data-frase="Envíos a todo el Perú.">+ Envíos a todo el Perú</button>
+            <button type="button" data-frase="Garantía de fábrica.">+ Garantía</button>
+            <button type="button" data-frase="Stock limitado.">+ Stock limitado</button>
+            <button type="button" data-frase="Precio especial por mayor.">+ Precio por mayor</button>
+          </div></div>
+        <label class="opcion"><span><b>Destacado</b><small>Aparece arriba, en "Destacados y novedades"</small></span>
+          <span class="interruptor"><input type="checkbox" id="dDestacado"/><i></i></span></label>
+      </form>
+    </section>
+
+    <!-- ============ 3 · PUBLICAR EN ============ -->
+    <section class="vista" id="vDestino" hidden>
+      <label class="opcion"><span><b>Web: catálogo público</b><small>Con foto, precio y botón de WhatsApp</small></span>
+        <span class="interruptor"><input type="checkbox" id="xWeb" checked/><i></i></span></label>
+      <label class="opcion"><span><b>Lista mayorista</b><small>La ven solo tus clientes con usuario</small></span>
+        <span class="interruptor"><input type="checkbox" id="xMay"/><i></i></span></label>
+      <div class="mayorista" id="bloqueMay" hidden>
+        <div class="fila2">
+          <div class="campo"><label for="mStock">Stock *</label><input id="mStock" type="number" inputmode="numeric" min="0" step="1" value="10"/></div>
+          <div class="campo"><label for="mUnidad">Unidad</label><select id="mUnidad"><option>und</option><option>jgo</option><option>par</option><option>tira</option><option>m</option></select></div>
+        </div>
+        <div class="fila2">
+          <div class="campo"><label for="mP1">Precio desde 1 *</label><input id="mP1" type="number" inputmode="decimal" min="0" step="0.01"/></div>
+          <div class="campo"><label for="mP12">Precio desde 12</label><input id="mP12" type="number" inputmode="decimal" min="0" step="0.01" placeholder="Opcional"/></div>
+        </div>
+        <small class="error" id="eMay"></small>
+      </div>
+      <div class="nota"><b>Facebook</b>Al terminar, toca <b>Compartir</b> y elige Facebook. El texto se copia solo para que lo pegues.</div>
+      <h2 class="previa-titulo">Así se verá en tu web</h2>
+      <article class="previa" id="previa">
+        <div class="previa-img" id="previaImg"></div>
+        <div class="previa-info">
+          <div class="previa-cat" id="previaCat"></div>
+          <div class="previa-nom" id="previaNom"></div>
+          <div class="previa-precio" id="previaPrecio"></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- ============ LISTO ============ -->
+    <section class="vista" id="vListo" hidden>
+      <div class="listo">
+        <div class="listo-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg></div>
+        <h1>¡Publicado!</h1>
+        <ul class="listo-lista" id="listoLista"></ul>
+      </div>
+      <div class="acciones-listo">
+        <button class="btn btn-principal" type="button" id="btnCompartir">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>
+          Compartir en Facebook o WhatsApp</button>
+        <button class="btn btn-sec" type="button" id="btnCopiar">Copiar texto de la publicación</button>
+        <a class="btn btn-sec" id="btnVer" target="_blank" rel="noopener" href="../">Ver en la web</a>
+      </div>
+      <details class="texto-pub"><summary>Texto de la publicación</summary><pre id="textoPub"></pre></details>
+    </section>
+  </main>
+
+  <!-- ============ BARRA DE ACCIÓN ============ -->
+  <footer class="accion" id="accion" hidden>
+    <button class="btn btn-principal" type="button" id="btnSiguiente">Continuar</button>
+  </footer>
+
+  <div class="cubierta" id="cubierta" hidden><div class="girador"></div><p id="cubiertaTexto">Publicando…</p></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="../js/config.js"></script>
+<script src="../js/comun.js"></script>
+<script src="../js/categorias.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

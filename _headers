@@ -12,3 +12,10 @@
   X-Frame-Options: DENY
   X-Robots-Tag: noindex, nofollow
   Cache-Control: no-store
+
+/publicar/*
+  X-Robots-Tag: noindex, nofollow
+  X-Frame-Options: DENY
+
+/publicar/sw.js
+  Cache-Control: no-cache
