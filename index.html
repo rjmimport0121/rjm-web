@@ -583,13 +583,14 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
 </style>
 <link rel="stylesheet" href="css/mejoras.css"/>
 <link rel="stylesheet" href="css/interactivo.css"/>
+<link rel="stylesheet" href="css/tema.css"/>
 </head>
 <body>
 
 <!-- NAV -->
 <nav id="nav">
   <a href="#hero" class="nav-logo">
-    <picture><source srcset="img/logo-96.webp" type="image/webp"/><img src="img/logo-96.png" alt="RJM Import Export" width="40" height="40" style="height:40px;width:40px" onerror="this.closest('picture').outerHTML='RJM <span class=nav-logo-badge>IMPORT</span>'"/></picture>
+    <picture><source srcset="img/logo-320.webp" type="image/webp"/><img src="img/logo-192.png" alt="RJM Import Export" width="60" height="60" onerror="this.closest('picture').outerHTML='RJM <span class=nav-logo-badge>IMPORT</span>'"/></picture>
   </a>
   <ul class="nav-links">
     <li><a href="#productos">Productos</a></li>
@@ -620,6 +621,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
   <div class="hero-glow2"></div>
   <div class="hero-inner">
     <div class="hero-content">
+      <div class="hero-logo hero-logo-movil" aria-hidden="true"><picture><source srcset="img/logo-320.webp" type="image/webp"/><img src="img/logo-320.png" alt="" width="260" height="260" fetchpriority="high"/></picture></div>
       <div class="hero-eyebrow">RJM Import-Export EIRL · Ayacucho, Perú</div>
       <h1 class="hero-title">
         Tecnología al<br>servicio del<br><span class="hl">músico & luthier</span>
@@ -635,6 +637,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
       </div>
     </div>
     <div class="hero-visual">
+      <div class="hero-logo" aria-hidden="true"><picture><source srcset="img/logo-320.webp" type="image/webp"/><img src="img/logo-320.png" alt="" width="260" height="260" fetchpriority="high"/></picture></div>
       <div class="hero-card-main">
         <div class="hero-card-label">// Estado operacional</div>
         <div class="hero-metrics">
@@ -683,6 +686,9 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
     </div>
   </div>
 </div>
+
+<!-- CINTA DE CATEGORÍAS -->
+<div class="cinta" aria-hidden="true"><div class="cinta-pista"><span>Cuerdas para guitarra</span><span>Clavijeros</span><span>Afinadores</span><span>Preamplificadores</span><span>Pastillas piezo</span><span>Ecualizadores</span><span>Potenciómetros</span><span>Maderas para luthiería</span><span>Trastes</span><span>Cejuelas de hueso</span><span>Diseño 3D y CNC</span><span>Impresión 3D</span><span>Electrónica a medida</span><span>Envíos a todo el Perú</span><span>Cuerdas para guitarra</span><span>Clavijeros</span><span>Afinadores</span><span>Preamplificadores</span><span>Pastillas piezo</span><span>Ecualizadores</span><span>Potenciómetros</span><span>Maderas para luthiería</span><span>Trastes</span><span>Cejuelas de hueso</span><span>Diseño 3D y CNC</span><span>Impresión 3D</span><span>Electrónica a medida</span><span>Envíos a todo el Perú</span></div></div>
 
 <!-- PRODUCTOS -->
 <section id="productos">
@@ -1240,6 +1246,14 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
   </div>
 </footer>
 
+<!-- Barra inferior (sólo celular) -->
+<nav class="barra-movil" aria-label="Accesos rápidos">
+  <a href="#productos"><span class="ico">🛍️</span>Productos</a>
+  <button type="button" id="bmLista"><span class="ico">🧾</span>Mi lista<span class="cuenta-movil" id="bmCuenta" hidden>0</span></button>
+  <a href="mayoristas.html"><span class="ico">🏷️</span>Mayoristas</a>
+  <a class="wa" href="https://wa.me/51956543522?text=Hola!%20Me%20interesa%20conocer%20sus%20productos" target="_blank" rel="noopener"><span class="ico">💬</span>WhatsApp</a>
+</nav>
+
 <!-- WhatsApp flotante -->
 <a href="https://wa.me/51956543522?text=Hola! Me interesa conocer sus productos y servicios" class="wa-float" target="_blank" rel="noopener" title="Escribir por WhatsApp" aria-label="Contactar por WhatsApp">
   <span class="wa-pulse"></span>
@@ -1342,5 +1356,6 @@ function enviarConsulta(e) {
 <script src="js/catalogo.js" defer></script>
 <script src="js/mejoras.js" defer></script>
 <script src="js/interactivo.js" defer></script>
+<script src="js/tema.js" defer></script>
 </body>
 </html>

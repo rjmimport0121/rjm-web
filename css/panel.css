@@ -90,3 +90,22 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
   .wrap{padding:1.25rem 1rem}
   .tramo{grid-template-columns:1fr 1fr}
 }
+
+/* ---------- Tema de marca RJM (colores del logo) ---------- */
+:root{--blue:#ea580c;--blue-lite:#f97316;--cyan:#fbbf24;
+  --border:rgba(251,146,60,.16);--border2:rgba(251,146,60,.07);
+  --degradado:linear-gradient(135deg,#e2560b 0%,#f59e0b 55%,#fbbf24 100%)}
+.top{height:72px}
+.top .marca img{height:52px;width:52px;border-radius:12px;box-shadow:0 0 0 2px rgba(251,191,36,.55),0 6px 18px rgba(234,88,12,.4)}
+.btn{border-radius:999px}
+.btn:not(.sec):not(.peligro){background:var(--degradado);color:#1a0d00;font-weight:600;border-color:transparent}
+.btn:not(.sec):not(.peligro):hover{filter:brightness(1.08)}
+.card,.modal,.tabla-wrap,.resumen{border-radius:16px}
+input,select,textarea{border-radius:10px}
+.tab.activo{border-bottom-color:var(--cyan)}
+@media(max-width:600px){
+  .top{height:64px}
+  .top .marca img{height:44px;width:44px}
+  .btn{min-height:46px}
+  .cant{min-height:44px;font-size:1rem}
+}

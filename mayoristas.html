@@ -16,12 +16,33 @@
   .resumen{position:sticky;bottom:0;background:var(--panel);border:1px solid var(--border);padding:1rem;margin-top:1rem;
     display:flex;flex-wrap:wrap;gap:1rem;align-items:center;justify-content:space-between}
   .resumen .total{font-family:var(--display);font-size:1.2rem;color:var(--white)}
+  /* Celular: cada producto como tarjeta (sin deslizar de lado) */
+  @media(max-width:700px){
+    #vistaLista .tabla-wrap{overflow:visible;border:none;background:none}
+    #vistaLista table,#vistaLista tbody{display:block}
+    #vistaLista thead{display:none}
+    #tbLista tr{display:grid;grid-template-columns:1fr auto;gap:.35rem .8rem;background:var(--panel);
+      border:1px solid var(--border);border-radius:16px;padding:1rem;margin-bottom:.8rem}
+    #tbLista td{display:block;padding:0;border:none;text-align:left}
+    #tbLista td:nth-child(1){grid-column:1;font-family:var(--mono);font-size:.7rem;color:var(--cyan)}
+    #tbLista td:nth-child(3){grid-column:2;grid-row:1;text-align:right;font-size:.8rem}
+    #tbLista td:nth-child(2){grid-column:1 / -1;font-size:1rem}
+    #tbLista td:nth-child(4){grid-column:1 / -1;white-space:normal;padding:.5rem .7rem;border-radius:10px;background:rgba(251,146,60,.06)}
+    #tbLista td:nth-child(5){grid-column:1;align-self:center}
+    #tbLista td:nth-child(6){grid-column:2;align-self:center;text-align:right;font-family:var(--display);font-size:1.05rem;color:var(--white)}
+    #tbLista td:nth-child(5)::before{content:'Cantidad';display:block;font-size:.7rem;color:var(--text);margin-bottom:.2rem}
+    #tbLista .cant{width:120px;min-height:48px;font-size:1.1rem;text-align:center}
+    #tbLista td[colspan]{grid-column:1 / -1}
+    .resumen{border-radius:16px 16px 0 0;margin-inline:-1rem}
+    .resumen .btn{width:100%}
+    #vistaLista .barra input{width:100%;min-height:48px}
+  }
 </style>
 </head>
 <body>
 
 <header class="top">
-  <a class="marca" href="index.html"><img src="img/logo-96.png" alt="RJM" width="34" height="34"/><span>RJM <small>Portal mayorista</small></span></a>
+  <a class="marca" href="index.html"><img src="img/logo-192.png" alt="RJM" width="52" height="52"/><span>RJM <small>Portal mayorista</small></span></a>
   <div class="acciones">
     <span id="quien"></span>
     <button class="btn sec chico oculto" id="btnSalir">Cerrar sesión</button>
