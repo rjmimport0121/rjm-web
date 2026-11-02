@@ -102,6 +102,7 @@
       ? Object.entries(porMoneda).map(([m, v]) => precio(v, m)).join(' + ') : 'S/ 0.00';
     $('btnPedido').disabled = !hay;
     $('btnPdf').disabled = !hay;
+    $('btnCompartir').disabled = !hay;
   }
 
   $('buscar').addEventListener('input', pintar);
@@ -242,32 +243,75 @@
     return new File([doc.output('blob')], nombre, { type: 'application/pdf' });
   }
 
-  $('btnPedido').addEventListener('click', () => {
-    window.open(RJM.waLink(textoProforma(datosProforma())), '_blank', 'noopener');
+  // ---------- Enviar y descargar la proforma ----------
+  function descargar(archivo) {
+    const url = URL.createObjectURL(archivo);
+    const a = Object.assign(document.createElement('a'), { href: url, download: archivo.name });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+  }
+
+  // Sube el PDF al almacenamiento privado "proformas" y devuelve un enlace que dura 90 días.
+  async function enlaceProforma(archivo, d) {
+    const azar = Math.random().toString(36).slice(2, 8);
+    const ruta = `${perfil.id}/${d.numero}-${azar}.pdf`;
+    const { error } = await sb.storage.from('proformas').upload(ruta, archivo, { contentType: 'application/pdf', upsert: false });
+    if (error) throw error;
+    const { data, error: e2 } = await sb.storage.from('proformas').createSignedUrl(ruta, 60 * 60 * 24 * 90);
+    if (e2 || !data?.signedUrl) throw e2 || new Error('Sin enlace');
+    return data.signedUrl;
+  }
+
+  function trabajando(btn, si, texto) {
+    if (si) { btn.dataset.etiqueta = btn.textContent; btn.textContent = texto; btn.disabled = true; }
+    else { btn.textContent = btn.dataset.etiqueta || btn.textContent; totales(); } // totales() vuelve a habilitar los botones
+  }
+
+  // 1) Enviar directo al chat de RJM: WhatsApp se abre en el chat de RJM con la
+  //    proforma escrita y el enlace al PDF; el cliente solo pulsa "Enviar".
+  $('btnPedido').addEventListener('click', async () => {
+    const btn = $('btnPedido');
+    const ventana = window.open('', '_blank'); // se abre ya, para que el navegador no la bloquee
+    try { if (ventana) ventana.document.write('<p style="font:16px sans-serif;padding:24px">Abriendo WhatsApp…</p>'); } catch (_) {}
+    trabajando(btn, true, 'Preparando…'); aviso('listaMsg', '');
+    const d = datosProforma();
+    let texto = textoProforma(d), conPdf = false;
+    try {
+      const enlace = await enlaceProforma(await pdfProforma(d), d);
+      texto += `\n\n📄 *Proforma en PDF:* ${enlace}`; conPdf = true;
+    } catch (e) { console.warn('Proforma sin enlace al PDF:', e); }
+    const url = RJM.waLink(texto);
+    if (ventana && !ventana.closed) ventana.location.href = url; else location.href = url;
+    trabajando(btn, false);
+    aviso('listaMsg', conPdf ? 'Se abrió WhatsApp en el chat de RJM con tu proforma y el enlace al PDF. Solo pulsa "Enviar".'
+      : 'Se abrió WhatsApp en el chat de RJM con tu proforma. Si quieres adjuntar el PDF, usa "Descargar PDF" o "Compartir PDF".', 'ok');
   });
 
-  // PDF: en el celular se comparte directo (WhatsApp aparece en la lista);
-  // en la computadora se descarga para adjuntarlo en WhatsApp.
+  // 2) Descargar el PDF (computadora o celular).
   $('btnPdf').addEventListener('click', async () => {
-    const btn = $('btnPdf'), etiqueta = btn.textContent;
-    btn.disabled = true; btn.textContent = 'Generando PDF…'; aviso('listaMsg', '');
+    const btn = $('btnPdf'); trabajando(btn, true, 'Generando PDF…'); aviso('listaMsg', '');
     try {
-      const d = datosProforma();
-      const archivo = await pdfProforma(d);
-      if (navigator.canShare && navigator.canShare({ files: [archivo] })) {
-        try {
-          await navigator.share({ files: [archivo], title: 'Proforma ' + d.numero, text: `Proforma ${d.numero} – ${perfil.nombre || perfil.usuario}` });
-          return;
-        } catch (e) { if (e.name === 'AbortError') return; }
-      }
-      const url = URL.createObjectURL(archivo);
-      const a = Object.assign(document.createElement('a'), { href: url, download: archivo.name });
-      document.body.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 10000);
-      aviso('listaMsg', `PDF descargado (${archivo.name}). Adjúntalo en tu chat de WhatsApp con RJM.`, 'ok');
-    } catch (e) {
-      aviso('listaMsg', 'No se pudo generar el PDF: ' + e.message);
-    } finally { btn.disabled = $('btnPedido').disabled; btn.textContent = etiqueta; }
+      const archivo = await pdfProforma(datosProforma());
+      descargar(archivo);
+      aviso('listaMsg', `PDF descargado: ${archivo.name}.`, 'ok');
+    } catch (e) { aviso('listaMsg', 'No se pudo generar el PDF: ' + e.message); }
+    finally { trabajando(btn, false); }
+  });
+
+  // 3) Compartir el PDF con el menú del sistema (WhatsApp, correo…), donde exista.
+  const puedeCompartir = (() => {
+    try { return !!(navigator.canShare && navigator.canShare({ files: [new File(['x'], 'p.pdf', { type: 'application/pdf' })] })); }
+    catch (_) { return false; }
+  })();
+  $('btnCompartir').classList.toggle('oculto', !puedeCompartir);
+  $('btnCompartir').addEventListener('click', async () => {
+    const btn = $('btnCompartir'); trabajando(btn, true, 'Generando PDF…'); aviso('listaMsg', '');
+    try {
+      const d = datosProforma(), archivo = await pdfProforma(d);
+      await navigator.share({ files: [archivo], title: 'Proforma ' + d.numero,
+        text: `Proforma ${d.numero} – ${perfil.nombre || perfil.usuario}. Para RJM: WhatsApp +51 956 543 522` });
+    } catch (e) { if (e.name !== 'AbortError') aviso('listaMsg', 'No se pudo compartir: ' + e.message + '. Usa "Descargar PDF".'); }
+    finally { trabajando(btn, false); }
   });
 
   iniciar();

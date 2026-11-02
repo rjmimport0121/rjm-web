@@ -204,3 +204,19 @@ create policy fotos_admin_borrar on storage.objects
 --   update public.perfiles set rol = 'admin', activo = true, usuario = 'rafa'
 --   where id = (select id from auth.users where email = 'TU-CORREO@ejemplo.com');
 -- ============================================================
+
+-- ------------------------------------------------------------
+-- 8. PROFORMAS EN PDF (enlace que el portal envía por WhatsApp)
+--    Mismo contenido que supabase/proformas.sql.
+-- ------------------------------------------------------------
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('proformas', 'proformas', false, 2097152, array['application/pdf'])
+on conflict (id) do nothing;
+drop policy if exists proformas_subir on storage.objects;
+create policy proformas_subir on storage.objects
+  for insert to authenticated
+  with check (bucket_id = 'proformas' and (storage.foldername(name))[1] = auth.uid()::text and public.es_mayorista_activo());
+drop policy if exists proformas_leer on storage.objects;
+create policy proformas_leer on storage.objects
+  for select to authenticated
+  using (bucket_id = 'proformas' and ((storage.foldername(name))[1] = auth.uid()::text or public.es_admin()));
