@@ -1,0 +1,5 @@
+# Archivos que Cloudflare no debe publicar como parte de la web
+supabase
+docs
+README.md
+.git

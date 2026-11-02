@@ -493,6 +493,31 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
 }
 @keyframes pulse{0%{transform:scale(1);opacity:.4}100%{transform:scale(1.8);opacity:0}}
 
+/* CATÁLOGO DINÁMICO (productos cargados desde el panel admin) */
+.dyn-filtros{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem}
+.dyn-filtro{background:transparent;border:1px solid var(--border);color:var(--text);
+  font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;padding:.4rem .8rem;cursor:pointer}
+.dyn-filtro.activo,.dyn-filtro:hover{border-color:var(--blue-lite);color:var(--white)}
+.product-price{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--white);margin:-.4rem 0 .9rem}
+.product-price small{font-family:var(--mono);font-size:.55rem;letter-spacing:.1em;color:var(--text);opacity:.7;margin-left:.3rem}
+.product-btns{display:flex;flex-wrap:wrap;gap:.5rem}
+.product-action.wa{background:#22c55e;border-color:#22c55e;color:#fff}
+.product-action.wa:hover{background:#16a34a;border-color:#16a34a}
+.product-card[data-id]{cursor:pointer}
+.pmodal-fondo{position:fixed;inset:0;z-index:950;background:rgba(0,0,0,.75);display:none;align-items:flex-start;justify-content:center;padding:5vh 1rem;overflow-y:auto}
+.pmodal-fondo.abierto{display:flex}
+.pmodal{background:var(--panel);border:1px solid var(--border);max-width:880px;width:100%;display:grid;grid-template-columns:1fr 1fr;position:relative}
+.pmodal-img{background:var(--surface);min-height:280px}
+.pmodal-img img{width:100%;height:100%;object-fit:cover}
+.pmodal-body{padding:2rem}
+.pmodal-body h3{font-family:var(--display);font-size:1.5rem;color:var(--white);line-height:1.2;margin-bottom:.6rem}
+.pmodal-body p{font-size:.9rem;margin-bottom:1rem;white-space:pre-line}
+.pmodal-body ul{list-style:none;margin-bottom:1.2rem;font-size:.85rem}
+.pmodal-body li{padding:.35rem 0;border-bottom:1px solid var(--border2);color:var(--text2)}
+.pmodal-body li::before{content:'▸ ';color:var(--cyan)}
+.pmodal-cerrar{position:absolute;top:.6rem;right:.6rem;background:rgba(8,12,18,.8);border:1px solid var(--border);color:var(--white);width:36px;height:36px;cursor:pointer;font-size:1rem;z-index:2}
+@media(max-width:700px){.pmodal{grid-template-columns:1fr}.pmodal-body{padding:1.4rem}}
+
 /* ANIMATIONS */
 .anim{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease}
 .anim.visible{opacity:1;transform:none}
@@ -538,6 +563,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
     <li><a href="#productos">Productos</a></li>
     <li><a href="#servicios">Servicios</a></li>
     <li><a href="#sobre">Nosotros</a></li>
+    <li><a href="mayoristas.html">Mayoristas</a></li>
     <li><a href="#contacto" class="nav-cta">Contactar</a></li>
   </ul>
   <button class="nav-toggle" id="navToggle" aria-label="Menú" aria-expanded="false">
@@ -549,6 +575,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
   <a href="#productos" onclick="closeMenu()">Productos</a>
   <a href="#servicios" onclick="closeMenu()">Servicios</a>
   <a href="#sobre" onclick="closeMenu()">Nosotros</a>
+  <a href="mayoristas.html">Portal mayorista</a>
   <a href="#contacto" onclick="closeMenu()">Contactar</a>
 </div>
 
@@ -630,6 +657,13 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
       <div class="tag">Catálogo completo</div>
       <h2 class="section-title">Nuestros Productos</h2>
       <p class="section-sub">Accesorios, componentes y materiales seleccionados para músicos, técnicos y luthiers exigentes.</p>
+    </div>
+
+    <!-- CATÁLOGO CON PRECIOS (se llena desde admin.html; oculto si no hay productos) -->
+    <div class="cat-section" id="catalogoDinamico" hidden>
+      <div class="cat-section-title">🛒 Productos disponibles</div>
+      <div class="dyn-filtros" id="dynFiltros"></div>
+      <div class="products-grid" id="dynGrid"></div>
     </div>
 
     <!-- ACCESORIOS -->
@@ -1122,6 +1156,8 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:3rem 2rem
         <li><a href="mailto:rjm.import.export@gmail.com">Email</a></li>
         <li><a href="https://www.rjmimport.com/" target="_blank" rel="noopener">Web oficial</a></li>
         <li><a href="#sobre">Sobre nosotros</a></li>
+        <li><a href="mayoristas.html">Portal mayorista</a></li>
+        <li><a href="admin.html" rel="nofollow">Administración</a></li>
       </ul>
     </div>
   </div>
@@ -1207,5 +1243,26 @@ function enviarConsulta(e) {
   window.open(`https://wa.me/51956543522?text=${encodeURIComponent(msg)}`, '_blank');
 }
 </script>
+
+<!-- Ficha de producto -->
+<div class="pmodal-fondo" id="pmodal" role="dialog" aria-modal="true" aria-labelledby="pmTitulo">
+  <div class="pmodal">
+    <button class="pmodal-cerrar" id="pmCerrar" aria-label="Cerrar">✕</button>
+    <div class="pmodal-img" id="pmImg"></div>
+    <div class="pmodal-body">
+      <div class="product-cat" id="pmCat"></div>
+      <h3 id="pmTitulo"></h3>
+      <div class="product-price" id="pmPrecio" style="margin:0 0 1rem"></div>
+      <p id="pmDesc"></p>
+      <ul id="pmCarac"></ul>
+      <a class="btn btn-primary" id="pmWa" target="_blank" rel="noopener" style="background:#22c55e">💬 Consultar por WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+<script src="js/config.js" defer></script>
+<script src="js/comun.js" defer></script>
+<script src="js/catalogo.js" defer></script>
 </body>
 </html>

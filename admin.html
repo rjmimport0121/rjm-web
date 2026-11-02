@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>Panel de administración | RJM Import-Export</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/panel.css"/>
+</head>
+<body>
+
+<header class="top">
+  <a class="marca" href="index.html"><img src="logo.png" alt="RJM"/><span>RJM <small>Administración</small></span></a>
+  <div class="acciones">
+    <span id="quien"></span>
+    <button class="btn sec chico oculto" id="btnSalir">Cerrar sesión</button>
+  </div>
+</header>
+
+<!-- ============ LOGIN ============ -->
+<main id="vistaLogin" class="wrap">
+  <div class="card login">
+    <h1>Panel de administración</h1>
+    <p class="sub">Acceso sólo para el administrador de RJM.</p>
+    <div id="loginMsg"></div>
+    <form id="formLogin" autocomplete="on">
+      <div class="campo"><label for="lUsuario">Correo o usuario</label><input id="lUsuario" autocomplete="username" required/></div>
+      <div class="campo"><label for="lClave">Contraseña</label><input id="lClave" type="password" autocomplete="current-password" required/></div>
+      <button class="btn full" id="btnEntrar">Ingresar</button>
+    </form>
+  </div>
+</main>
+
+<!-- ============ PANEL ============ -->
+<main id="vistaPanel" class="wrap oculto">
+  <h1>Panel de administración</h1>
+  <p class="sub">Gestiona el catálogo público, la lista mayorista y los accesos de tus clientes mayoristas.</p>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab activo" data-tab="catalogo">Catálogo web</button>
+    <button class="tab" data-tab="mayorista">Lista mayorista</button>
+    <button class="tab" data-tab="usuarios">Usuarios mayoristas</button>
+  </nav>
+  <div id="panelMsg"></div>
+
+  <!-- CATÁLOGO WEB -->
+  <section id="tab-catalogo">
+    <div class="barra">
+      <input type="search" id="buscarCat" placeholder="Buscar producto…"/>
+      <button class="btn" id="btnNuevoProd">+ Nuevo producto</button>
+    </div>
+    <div class="tabla-wrap"><table>
+      <thead><tr><th>Foto</th><th>Producto</th><th>Categoría</th><th class="num">Precio</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="tbCatalogo"><tr><td colspan="6">Cargando…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <!-- LISTA MAYORISTA -->
+  <section id="tab-mayorista" class="oculto">
+    <div class="barra">
+      <input type="search" id="buscarMay" placeholder="Buscar producto…"/>
+      <button class="btn" id="btnNuevoMay">+ Nuevo producto mayorista</button>
+    </div>
+    <p class="sub" style="font-size:.8rem">Los mayoristas sólo ven los productos <b>activos con stock mayor a 0</b>, sin fotos, con los precios por cantidad que definas aquí.</p>
+    <div class="tabla-wrap"><table>
+      <thead><tr><th>SKU</th><th>Producto</th><th class="num">Stock</th><th>Precios por cantidad</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="tbMayorista"><tr><td colspan="6">Cargando…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <!-- USUARIOS -->
+  <section id="tab-usuarios" class="oculto">
+    <div class="card">
+      <h2>Crear usuario mayorista</h2>
+      <form id="formUsuario" autocomplete="off">
+        <div class="fila">
+          <div class="campo"><label for="uUsuario">Usuario</label><input id="uUsuario" required pattern="[a-z0-9._\-]{3,30}" placeholder="ej: musicalcentro"/></div>
+          <div class="campo"><label for="uClave">Contraseña (mín. 8)</label><input id="uClave" type="text" required minlength="8"/></div>
+          <div class="campo"><label for="uNombre">Cliente / razón social</label><input id="uNombre"/></div>
+          <div class="campo"><label for="uRuc">RUC / DNI</label><input id="uRuc" inputmode="numeric" maxlength="11"/></div>
+          <div class="campo"><label for="uTel">Teléfono</label><input id="uTel" inputmode="tel"/></div>
+        </div>
+        <div class="acciones-fila">
+          <button class="btn" id="btnCrearUsuario">Crear acceso</button>
+          <button type="button" class="btn sec" id="btnGenerarClave">Generar contraseña</button>
+        </div>
+      </form>
+    </div>
+    <div class="tabla-wrap"><table>
+      <thead><tr><th>Usuario</th><th>Cliente</th><th>RUC/DNI</th><th>Teléfono</th><th>Estado</th><th></th></tr></thead>
+      <tbody id="tbUsuarios"><tr><td colspan="6">Cargando…</td></tr></tbody>
+    </table></div>
+  </section>
+</main>
+
+<!-- MODAL: producto del catálogo -->
+<div class="modal-fondo oculto" id="modalProd">
+  <form class="modal" id="formProd">
+    <h2 id="tituloProd">Nuevo producto</h2>
+    <div id="prodMsg"></div>
+    <div class="campo"><label for="pNombre">Nombre *</label><input id="pNombre" required maxlength="140"/></div>
+    <div class="fila">
+      <div class="campo"><label for="pSku">SKU / código</label><input id="pSku" maxlength="60"/></div>
+      <div class="campo"><label for="pCategoria">Categoría *</label><input id="pCategoria" list="listaCategorias" required/></div>
+      <div class="campo"><label for="pMarca">Marca</label><input id="pMarca"/></div>
+    </div>
+    <div class="campo"><label for="pDesc">Descripción</label><textarea id="pDesc" maxlength="2000"></textarea></div>
+    <div class="campo"><label for="pCarac">Características (una por línea)</label><textarea id="pCarac" placeholder="Material: acero&#10;Calibre: 10-46&#10;Compatible con guitarra eléctrica"></textarea></div>
+    <div class="fila">
+      <div class="campo"><label for="pPrecio">Precio</label><input id="pPrecio" type="number" min="0" step="0.01" placeholder="vacío = consultar"/></div>
+      <div class="campo"><label for="pMoneda">Moneda</label><select id="pMoneda"><option value="PEN">Soles (S/)</option><option value="USD">Dólares (US$)</option></select></div>
+      <div class="campo"><label for="pOrden">Orden</label><input id="pOrden" type="number" step="1" value="0"/></div>
+    </div>
+    <div class="campo">
+      <label for="pFoto">Foto (JPG, PNG o WebP)</label>
+      <input id="pFoto" type="file" accept="image/jpeg,image/png,image/webp"/>
+      <img id="pFotoPrev" class="foto-prev oculto" alt="Vista previa"/>
+    </div>
+    <div class="fila">
+      <label class="check"><input type="checkbox" id="pIgv" checked/> Precio incluye IGV</label>
+      <label class="check"><input type="checkbox" id="pPublicado" checked/> Visible en la web</label>
+      <label class="check"><input type="checkbox" id="pDestacado"/> Destacado</label>
+    </div>
+    <div class="pie">
+      <button type="button" class="btn sec" data-cerrar>Cancelar</button>
+      <button class="btn" id="btnGuardarProd">Guardar</button>
+    </div>
+  </form>
+</div>
+<datalist id="listaCategorias">
+  <option>Accesorios para guitarra</option><option>Electrónica para instrumentos</option><option>Luthiería</option>
+</datalist>
+
+<!-- MODAL: producto mayorista -->
+<div class="modal-fondo oculto" id="modalMay">
+  <form class="modal" id="formMay">
+    <h2 id="tituloMay">Nuevo producto mayorista</h2>
+    <div id="mayMsg"></div>
+    <div class="campo"><label for="mNombre">Nombre *</label><input id="mNombre" required maxlength="140"/></div>
+    <div class="fila">
+      <div class="campo"><label for="mSku">SKU / código</label><input id="mSku" maxlength="60"/></div>
+      <div class="campo"><label for="mCategoria">Categoría</label><input id="mCategoria" list="listaCategorias"/></div>
+      <div class="campo"><label for="mUnidad">Unidad</label><input id="mUnidad" value="und" maxlength="20"/></div>
+    </div>
+    <div class="fila">
+      <div class="campo"><label for="mStock">Stock *</label><input id="mStock" type="number" min="0" step="1" required value="0"/></div>
+      <div class="campo"><label for="mMoneda">Moneda</label><select id="mMoneda"><option value="PEN">Soles (S/)</option><option value="USD">Dólares (US$)</option></select></div>
+      <div class="campo"><label for="mOrden">Orden</label><input id="mOrden" type="number" step="1" value="0"/></div>
+    </div>
+    <div class="campo">
+      <label>Precios por cantidad *</label>
+      <div class="tramos" id="tramos"></div>
+      <button type="button" class="btn sec chico" id="btnAgregarTramo" style="margin-top:.5rem">+ Agregar tramo</button>
+    </div>
+    <div class="campo"><label for="mNotas">Notas para el mayorista</label><input id="mNotas" maxlength="200"/></div>
+    <div class="fila">
+      <label class="check"><input type="checkbox" id="mIgv" checked/> Precios incluyen IGV</label>
+      <label class="check"><input type="checkbox" id="mMostrarStock" checked/> Mostrar cantidad en stock</label>
+      <label class="check"><input type="checkbox" id="mActivo" checked/> Activo</label>
+    </div>
+    <div class="pie">
+      <button type="button" class="btn sec" data-cerrar>Cancelar</button>
+      <button class="btn" id="btnGuardarMay">Guardar</button>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="js/config.js"></script>
+<script src="js/comun.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
