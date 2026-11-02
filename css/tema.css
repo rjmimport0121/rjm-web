@@ -239,3 +239,15 @@ h1,h2,h3,.hero-title,.section-title{font-family:var(--display);font-weight:800;l
 .stat-n,.metric-val,.paso-n,.marca-nombre,.nav-logo::after{font-family:var(--display);font-weight:800;letter-spacing:-.02em}
 .paso-n{letter-spacing:0}
 .lista-cant input{font-variant-numeric:tabular-nums}
+
+/* Logos de marcas propias (SVG): blanco y, al pasar el mouse, versión de color */
+.logo-propio{position:relative;display:block;width:100%;height:84px}
+.logo-propio img{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.35)) !important;opacity:1;transition:opacity .35s,transform .35s}
+.logo-propio .l-hover{opacity:0}
+.marca-card:hover .logo-propio .l-hover,.marca-card:focus-within .logo-propio .l-hover{opacity:1}
+.marca-card:hover .logo-propio .l-base,.marca-card:focus-within .logo-propio .l-base{opacity:0}
+.marca-card:hover .logo-propio img{transform:scale(1.05)}
+@media(max-width:600px){.logo-propio{height:60px}}
+@media(hover:none){.logo-propio .l-hover{opacity:1}.logo-propio .l-base{opacity:0}}
+.marca-logo{align-self:stretch}
