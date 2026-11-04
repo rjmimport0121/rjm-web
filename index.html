@@ -180,7 +180,7 @@
 <section class="sellos-sec" aria-label="Por qué comprar en RJM y marcas que distribuimos">
   <div class="contenedor">
     <ul class="sellos">
-      <li><span class="sello-ic"><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg></span><span><b>Envíos a todo el Perú</b><small>Shalom, Olva y otras agencias</small></span></li>
+      <li><span class="sello-ic"><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg></span><span><b>Envíos a todo el Perú</b><small>Por agencia Shalom</small></span></li>
       <li><span class="sello-ic"><svg class="ic" aria-hidden="true"><use href="#i-receipt"/></svg></span><span><b>Precios con IGV incluido</b><small>En todos los productos publicados</small></span></li>
       <li><span class="sello-ic sello-wa"><svg class="ic" aria-hidden="true"><use href="#i-whatsapp"/></svg></span><span><b>Atención por WhatsApp</b><small>Lun–Sáb, 9:00–19:00</small></span></li>
       <li><span class="sello-ic sello-azul"><svg class="ic" aria-hidden="true"><use href="#i-badge-check"/></svg></span><span><b>Empresa formal</b><small>RUC 20610045171</small></span></li>
@@ -373,14 +373,14 @@
       <li class="paso"><span class="paso-ic"><svg class="ic" aria-hidden="true"><use href="#i-badge-check"/></svg></span>
         <div><b>Confirma</b><p>Acordamos el pedido y la forma de pago que te resulte más cómoda.</p></div></li>
       <li class="paso"><span class="paso-ic"><svg class="ic" aria-hidden="true"><use href="#i-truck"/></svg></span>
-        <div><b>Recibe</b><p>Despachamos a todo el Perú por Shalom, Olva y otras agencias.</p></div></li>
+        <div><b>Recibe</b><p>Despachamos a todo el Perú por agencia Shalom. ¿Prefieres otra agencia? Consúltanos por WhatsApp.</p></div></li>
     </ol>
 
     <div class="faq-caja revelar">
       <h2 class="h2-chico" id="tFaq">Preguntas frecuentes</h2>
       <div class="faq">
         <details><summary>¿Los precios incluyen IGV?<svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary><p>Sí. Todos los precios publicados en la web incluyen IGV.</p></details>
-        <details><summary>¿Hacen envíos a provincias?<svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary><p>Sí. Enviamos a todo el Perú por Shalom, Olva y otras agencias de transporte, con empaque seguro.</p></details>
+        <details><summary>¿Hacen envíos a provincias?<svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary><p>Sí. Enviamos a todo el Perú por agencia Shalom, con empaque seguro. Si prefieres otra agencia, consúltanos por WhatsApp y te confirmamos si es posible y su costo.</p></details>
         <details><summary>¿Cuál es el horario de atención?<svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary><p>De lunes a sábado, de 9:00 a.m. a 7:00 p.m. Por WhatsApp puedes escribirnos en cualquier momento y te respondemos lo antes posible.</p></details>
         <details><summary>¿Venden al por mayor?<svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary><p>Sí. Los clientes mayoristas tienen un <a href="mayoristas.html">portal privado</a> con precios por cantidad. Si quieres ser distribuidor, <a class="faq-wa" data-texto="Hola RJM! Quisiera información para comprar al por mayor." href="https://wa.me/51956543522" target="_blank" rel="noopener">escríbenos por WhatsApp</a> y te damos acceso.</p></details>
         <details><summary>¿Pueden conseguir un producto que no está en el catálogo?<svg class="ic" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary><p>Consúltanos. Puede que lo tengamos en stock o que podamos importarlo. Si es una pieza que no existe en el mercado, también podemos diseñarla y fabricarla.</p></details>
@@ -517,8 +517,16 @@
   <div class="cajon-pie" id="carritoPie" hidden>
     <div class="carrito-total"><span>Subtotal <small>IGV incluido</small></span><b id="carritoTotal">S/ 0.00</b></div>
     <p class="carrito-nota" id="carritoNota" hidden></p>
+    <fieldset class="envio">
+      <legend class="c-label">Envío</legend>
+      <label class="envio-op"><input type="radio" name="envio" value="shalom" checked/><span><b>Agencia Shalom</b><small>A todo el Perú</small></span></label>
+      <label class="envio-op"><input type="radio" name="envio" value="otra"/><span><b>Otra agencia</b><small>Consúltala por WhatsApp</small></span></label>
+    </fieldset>
+    <label class="c-label" for="carritoDestino" id="tDestino">Ciudad de destino</label>
+    <input id="carritoDestino" class="c-input" maxlength="120" autocomplete="address-level2" placeholder="Ej.: Lima, Cusco, Huancayo"/>
+    <p class="envio-nota" id="envioNota" hidden>Te confirmamos por WhatsApp si podemos enviar con esa agencia y cuánto cuesta.</p>
     <label class="c-label" for="carritoComentario">Comentario (opcional)</label>
-    <textarea id="carritoComentario" rows="2" maxlength="400" placeholder="Ciudad de envío, para qué instrumento…"></textarea>
+    <textarea id="carritoComentario" rows="2" maxlength="400" placeholder="Para qué instrumento, alguna duda…"></textarea>
     <button type="button" class="btn btn-wa btn-l btn-ancho" id="carritoEnviar"><svg class="ic" aria-hidden="true"><use href="#i-whatsapp"/></svg>Enviar pedido por WhatsApp</button>
     <p class="carrito-aviso">Te confirmamos stock, precio final y envío por WhatsApp.</p>
     <div class="carrito-otros">

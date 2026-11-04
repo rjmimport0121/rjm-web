@@ -768,3 +768,16 @@ html.lenis,html.lenis body{height:auto}
 .redes a{width:44px;height:44px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.08);color:#fff;transition:background-color .2s,transform .2s}
 .redes a:hover{background:var(--naranja);transform:translateY(-2px)}
 .redes .ic{width:22px;height:22px}
+
+/* Envío en el carrito: agencia Shalom u otra agencia (se consulta) */
+.envio{border:0;margin:2px 0 0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.envio legend{padding:0;margin-bottom:6px}
+.envio-op{display:flex;align-items:center;gap:8px;min-height:52px;padding:8px 10px;border-radius:12px;border:1.5px solid var(--linea-2);background:#fff;cursor:pointer;color:var(--tinta)}
+.envio-op:has(input:checked){border-color:var(--naranja);background:var(--naranja-suave)}
+.envio-op input{width:18px;height:18px;flex:none;accent-color:var(--naranja-txt)}
+.envio-op span{display:grid;line-height:1.2}
+.envio-op b{font-size:14px}
+.envio-op small{font-size:12px;color:var(--tenue)}
+.cajon .c-input{width:100%;min-height:44px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--linea-2);background:#fff;font-size:16px;color:var(--tinta)}
+.cajon .c-input:focus{outline:none;border-color:var(--naranja);box-shadow:0 0 0 4px rgba(234,88,12,.15)}
+.envio-nota{font-size:12.5px;color:var(--naranja-txt);font-weight:600;margin-top:-2px}

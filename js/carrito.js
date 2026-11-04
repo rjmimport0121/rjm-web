@@ -237,10 +237,35 @@
     const tot = C.totales();
     if (tot.texto) t += `\n\n*Subtotal: ${tot.texto}*${tot.todoConIgv ? ' (IGV incluido)' : ''}`;
     if (tot.sinPrecio) t += `\n+ ${tot.sinPrecio} producto${tot.sinPrecio === 1 ? '' : 's'} con precio a consultar`;
+    const destino = $('carritoDestino').value.trim();
+    if (envioElegido() === 'otra') t += `\n\n*Envío:* otra agencia${destino ? ` (${destino})` : ''}. ¿Pueden enviar con esa agencia y cuánto costaría?`;
+    else t += `\n\n*Envío:* agencia Shalom${destino ? ` — destino: ${destino}` : ''}`;
     const nota = $('carritoComentario').value.trim();
     if (nota) t += `\n\nComentario: ${nota}`;
     return t + '\n\n¿Me confirman stock y costo de envío? Gracias.';
   }
+
+  // Envío: agencia Shalom por defecto; otra agencia se consulta por WhatsApp.
+  // La elección y la ciudad se recuerdan en este navegador para el próximo pedido.
+  const CLAVE_ENVIO = 'rjm_envio_v1';
+  const envioElegido = () => (document.querySelector('input[name="envio"]:checked') || {}).value || 'shalom';
+  function pintarEnvio() {
+    const otra = envioElegido() === 'otra';
+    $('tDestino').textContent = otra ? 'Agencia y ciudad que prefieres' : 'Ciudad de destino';
+    $('carritoDestino').placeholder = otra ? 'Ej.: Olva, a Arequipa' : 'Ej.: Lima, Cusco, Huancayo';
+    $('envioNota').hidden = !otra;
+  }
+  function guardarEnvio() {
+    try { localStorage.setItem(CLAVE_ENVIO, JSON.stringify({ via: envioElegido(), destino: $('carritoDestino').value.trim() })); } catch (_) {}
+  }
+  try {
+    const previo = JSON.parse(localStorage.getItem(CLAVE_ENVIO) || 'null');
+    if (previo && previo.via === 'otra') document.querySelector('input[name="envio"][value="otra"]').checked = true;
+    if (previo && typeof previo.destino === 'string') $('carritoDestino').value = previo.destino.slice(0, 120);
+  } catch (_) { /* sin almacenamiento */ }
+  document.querySelectorAll('input[name="envio"]').forEach(r => r.addEventListener('change', () => { pintarEnvio(); guardarEnvio(); }));
+  $('carritoDestino').addEventListener('change', guardarEnvio);
+  pintarEnvio();
   $('carritoEnviar').addEventListener('click', () => {
     if (!items.length) return;
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(mensajePedido())}`, '_blank', 'noopener');
