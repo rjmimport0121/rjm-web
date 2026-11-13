@@ -1,0 +1,7 @@
+# Buscadores: pueden ver la tienda y las páginas de producto.
+User-agent: *
+Disallow: /admin.html
+Disallow: /mayoristas.html
+Disallow: /publicar/
+
+Sitemap: https://www.rjmimport.com/sitemap.xml
