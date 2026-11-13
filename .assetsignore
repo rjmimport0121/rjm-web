@@ -7,3 +7,5 @@ docs
 README.md
 .wrangler
 android-app
+worker.js
+node_modules

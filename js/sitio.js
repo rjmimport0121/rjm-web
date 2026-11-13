@@ -1,6 +1,8 @@
 // Tienda pública de RJM: buscador con sugerencias, menú de categorías, portada
 // con producto destacado, estante de destacados, catálogo con filtros y orden,
-// ficha de producto con enlace directo (#producto=…) y formulario de contacto.
+// ficha de producto (ventana rápida #producto=…) y formulario de contacto.
+// Cada producto tiene además su página propia /producto/<nombre>/<id>, que
+// genera worker.js para Google y para compartir; aquí sus enlaces abren la ficha.
 // Los productos vienen de Supabase (tabla productos, solo publicado = true); los
 // publica el panel de administración o la app "RJM Publicar".
 // El carrito y las ventanas viven en js/carrito.js (se carga antes que este).
@@ -24,6 +26,10 @@
   const norm = t => String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
   const dinero = (n, m) => (m === 'USD' ? 'US$ ' : 'S/ ') + Number(n).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const waLink = t => `https://wa.me/${WA}?text=${encodeURIComponent(t)}`;
+  // Igual que slug() de worker.js: si cambias una, cambia la otra.
+  const slug = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/&/g, ' y ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80).replace(/-+$/, '') || 'producto';
+  const rutaProducto = p => `producto/${slug(p.nombre)}/${p.id}`;
   const icono = n => `<svg class="ic" aria-hidden="true"><use href="#i-${n}"/></svg>`;
   const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const punteroFino = matchMedia('(pointer: fine)').matches;
@@ -125,7 +131,7 @@
     let t = `Hola RJM! Quiero comprar este producto:\n\n*${p.nombre}*`;
     if (p.sku) t += `\nCódigo: ${p.sku}`;
     if (p.precio != null) t += `\nPrecio: ${dinero(p.precio, p.moneda)}${p.precio_incluye_igv === false ? '' : ' (IGV incluido)'}`;
-    t += `\n\nVer producto: ${SITIO}#producto=${p.id}\n\n¿Tienen disponibilidad?`;
+    t += `\n\nVer producto: ${SITIO}${rutaProducto(p)}\n\n¿Tienen disponibilidad?`;
     return waLink(t);
   }
   function imagenHTML(p) {
@@ -159,7 +165,7 @@
       <div class="t-img">${imagenHTML(p)}${insigniasHTML(p)}</div>
       <div class="t-info">
         <p class="t-marca">${esc(p.marca || p.categoria || '')}</p>
-        <h3 class="t-nombre"><a href="#producto=${esc(p.id)}">${esc(p.nombre)}</a></h3>
+        <h3 class="t-nombre"><a href="${esc(rutaProducto(p))}" data-ficha="${esc(p.id)}">${esc(p.nombre)}</a></h3>
         ${precioHTML(p)}
         ${accionesHTML(p, C.cantidad(p.id))}
       </div>
@@ -408,7 +414,8 @@
     if (!p || !vitrina) return;
     const spot = document.createElement('a');
     spot.className = 'spot';
-    spot.href = '#producto=' + p.id;
+    spot.href = rutaProducto(p);
+    spot.dataset.ficha = p.id;
     const etiqueta = p.destacado ? 'Destacado' : nuevos.has(p.id) ? 'Nuevo' : '';
     spot.innerHTML = `${etiqueta ? `<span class="etq">${etiqueta}</span>` : ''}
       <span class="spot-img"><img src="${esc(p.foto_url)}" alt="" width="400" height="400"/></span>
@@ -504,6 +511,15 @@
   });
   document.querySelectorAll('.marca[data-marca]').forEach(b => b.addEventListener('click', () => filtrar({ linea: '', sub: '', marca: '', q: b.dataset.marca }, true)));
 
+  // Enlaces a la página de un producto: en la tienda abren la ficha rápida.
+  // (Ctrl/Cmd + clic o "abrir en pestaña nueva" siguen yendo a la página.)
+  document.addEventListener('click', e => {
+    if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    const a = e.target.closest('a[data-ficha]'); if (!a || !buscarP(a.dataset.ficha)) return;
+    e.preventDefault();
+    location.hash = 'producto=' + a.dataset.ficha;
+  });
+
   // Enlaces internos (#seccion): con Lenis se desplazan suave; "#inicio" vuelve arriba.
   document.addEventListener('click', e => {
     if (e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
@@ -569,7 +585,7 @@
   });
   $('fCompartir').addEventListener('click', async () => {
     const p = buscarP(fichaId); if (!p) return;
-    const url = `${SITIO}#producto=${p.id}`;
+    const url = SITIO + rutaProducto(p);
     try {
       if (navigator.share) { await navigator.share({ title: p.nombre, text: `${p.nombre} — RJM Import-Export`, url }); return; }
       await navigator.clipboard.writeText(url);
