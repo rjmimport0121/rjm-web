@@ -91,15 +91,18 @@ function errorTemporal() {
 
 // ---------- /sitemap.xml ----------
 async function sitemap(env) {
-  const productos = await supabase(env, `productos?select=id,nombre,actualizado_en&publicado=eq.true&order=actualizado_en.desc&limit=5000`);
+  const productos = await supabase(env, `productos?select=id,nombre,foto_url,actualizado_en&publicado=eq.true&order=actualizado_en.desc&limit=5000`);
   const ultima = productos[0] ? productos[0].actualizado_en.slice(0, 10) : null;
   const urls = [
     { loc: SITIO + '/', lastmod: ultima },
     { loc: SITIO + '/libro-reclamaciones.html' },
-    ...productos.map(p => ({ loc: SITIO + rutaProducto(p), lastmod: String(p.actualizado_en || '').slice(0, 10) || null }))
+    ...productos.map(p => ({ loc: SITIO + rutaProducto(p), lastmod: String(p.actualizado_en || '').slice(0, 10) || null, foto: p.foto_url }))
   ];
-  const cuerpo = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    + urls.map(u => `  <url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`).join('\n')
+  // La foto de cada producto va como <image:image>, para que Google Imágenes la encuentre.
+  const cuerpo = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
+    + urls.map(u => `  <url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}`
+      + `${u.foto ? `<image:image><image:loc>${xml(u.foto)}</image:loc></image:image>` : ''}</url>`).join('\n')
     + '\n</urlset>\n';
   return new Response(cuerpo, { headers: cabeceras('application/xml; charset=utf-8') });
 }
