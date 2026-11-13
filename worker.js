@@ -36,15 +36,15 @@ export default {
 };
 
 // ---------- Utilidades ----------
-export function slug(texto) {
+function slug(texto) {
   const s = String(texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
     .replace(/&/g, ' y ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80).replace(/-+$/, '');
   return s || 'producto';
 }
-export const rutaProducto = p => `/producto/${slug(p.nombre)}/${p.id}`;
+const rutaProducto = p => `/producto/${slug(p.nombre)}/${p.id}`;
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const xml = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
-export function dinero(n, moneda) {
+function dinero(n, moneda) {
   const [ent, dec] = Number(n).toFixed(2).split('.');
   return (moneda === 'USD' ? 'US$ ' : 'S/ ') + ent.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + dec;
 }
@@ -134,7 +134,7 @@ function noEncontrado() {
   }), { status: 404, headers: { ...cabeceras('text/html; charset=utf-8'), 'Cache-Control': 'public, max-age=60' } });
 }
 
-export function htmlProducto(p, relacionados, env) {
+function htmlProducto(p, relacionados, env) {
   const WA = (env && env.WHATSAPP) || '51956543522';
   const url = SITIO + rutaProducto(p);
   const conPrecio = p.precio != null;
