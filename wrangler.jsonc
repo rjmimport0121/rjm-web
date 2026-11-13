@@ -1,15 +1,16 @@
 // Configuración de Cloudflare Workers.
 // La web es estática: Cloudflare sirve los archivos del repositorio tal cual.
-// worker.js solo atiende las rutas de "run_worker_first" (páginas de producto
-// para Google y sitemap.xml); ver los comentarios al inicio de worker.js.
+// worker.js solo recibe lo que no es un archivo del repositorio: las páginas de
+// producto para Google y sitemap.xml (ver los comentarios al inicio de worker.js).
+// No uses "run_worker_first" como lista: el build de Cloudflare usa Wrangler 3,
+// que solo la acepta como true/false, y el despliegue falla.
 {
   "name": "rjm-web",
   "main": "worker.js",
   "compatibility_date": "2026-05-01",
   "assets": {
     "directory": "./",
-    "binding": "ASSETS",
-    "run_worker_first": ["/producto/*", "/sitemap.xml"]
+    "binding": "ASSETS"
   },
   "vars": {
     // Datos públicos (los mismos de js/config.js). Nunca pongas aquí la service_role.

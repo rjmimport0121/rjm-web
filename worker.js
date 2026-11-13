@@ -1,9 +1,9 @@
 // Worker de Cloudflare para que Google y las redes vean cada producto.
 //
 // La tienda (index.html) es estática y abre las fichas dentro de la misma
-// página (#producto=…), algo que los buscadores no indexan. Este Worker solo
-// atiende dos rutas (ver "run_worker_first" en wrangler.jsonc); todo lo demás
-// lo sirve Cloudflare directo desde los archivos del repositorio:
+// página (#producto=…), algo que los buscadores no indexan. Cloudflare sirve
+// directo los archivos del repositorio y solo llama a este Worker cuando la
+// dirección no es un archivo. Atiende dos rutas; el resto responde 404:
 //
 //   /producto/<nombre>/<id>  Página propia del producto, generada al momento
 //                            con los datos de Supabase: título, precio, foto,
