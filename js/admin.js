@@ -74,10 +74,40 @@
 
   $('btnSalir').addEventListener('click', async () => { await RJM.salir(); location.reload(); });
 
+  // ---------------- CAMBIAR MI CONTRASEÑA ----------------
+  // Pide la contraseña actual para que nadie la cambie con una sesión abierta ajena.
+  $('btnClave').addEventListener('click', async () => {
+    $('formClave').reset(); aviso('claveMsg', '');
+    const { data } = await sb.auth.getUser();
+    $('cUsuario').value = data.user ? data.user.email : '';
+    $('modalClave').classList.remove('oculto');
+    $('cActual').focus();
+  });
+  $('formClave').addEventListener('submit', async e => {
+    e.preventDefault();
+    const actual = $('cActual').value, nueva = $('cNueva').value;
+    if (nueva !== $('cRepite').value) return aviso('claveMsg', 'Las dos contraseñas nuevas no coinciden.');
+    if (nueva.length < 10) return aviso('claveMsg', 'La contraseña nueva debe tener al menos 10 caracteres.');
+    if (nueva === actual) return aviso('claveMsg', 'La contraseña nueva debe ser distinta de la actual.');
+    ocupado('btnGuardarClave', true); aviso('claveMsg', '');
+    try {
+      const { data } = await sb.auth.getUser();
+      const email = data.user && data.user.email;
+      if (!email) return aviso('claveMsg', 'Tu sesión venció. Vuelve a entrar al panel.');
+      const { error: e1 } = await sb.auth.signInWithPassword({ email, password: actual });
+      if (e1) return aviso('claveMsg', 'La contraseña actual no es correcta.');
+      const { error: e2 } = await sb.auth.updateUser({ password: nueva });
+      if (e2) return aviso('claveMsg', RJM.errorLegible(e2));
+      $('formClave').reset();
+      aviso('claveMsg', 'Listo: tu contraseña cambió. Úsala también en la app RJM Publicar.', 'ok');
+    } finally { ocupado('btnGuardarClave', false); }
+  });
+
   function mostrarPanel(perfil) {
     $('vistaLogin').classList.add('oculto');
     $('vistaPanel').classList.remove('oculto');
     $('btnSalir').classList.remove('oculto');
+    $('btnClave').classList.remove('oculto');
     $('quien').textContent = perfil.usuario || perfil.email;
     cargarCatalogo(); cargarMayorista(); cargarUsuarios(); cargarReclamos();
   }

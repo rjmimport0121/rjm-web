@@ -36,15 +36,15 @@ export default {
 };
 
 // ---------- Utilidades ----------
-export function slug(texto) {
+function slug(texto) {
   const s = String(texto || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
     .replace(/&/g, ' y ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 80).replace(/-+$/, '');
   return s || 'producto';
 }
-export const rutaProducto = p => `/producto/${slug(p.nombre)}/${p.id}`;
+const rutaProducto = p => `/producto/${slug(p.nombre)}/${p.id}`;
 const esc = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const xml = v => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c]));
-export function dinero(n, moneda) {
+function dinero(n, moneda) {
   const [ent, dec] = Number(n).toFixed(2).split('.');
   return (moneda === 'USD' ? 'US$ ' : 'S/ ') + ent.replace(/\B(?=(\d{3})+(?!\d))/g, ',') + '.' + dec;
 }
@@ -91,15 +91,18 @@ function errorTemporal() {
 
 // ---------- /sitemap.xml ----------
 async function sitemap(env) {
-  const productos = await supabase(env, `productos?select=id,nombre,actualizado_en&publicado=eq.true&order=actualizado_en.desc&limit=5000`);
+  const productos = await supabase(env, `productos?select=id,nombre,foto_url,actualizado_en&publicado=eq.true&order=actualizado_en.desc&limit=5000`);
   const ultima = productos[0] ? productos[0].actualizado_en.slice(0, 10) : null;
   const urls = [
     { loc: SITIO + '/', lastmod: ultima },
     { loc: SITIO + '/libro-reclamaciones.html' },
-    ...productos.map(p => ({ loc: SITIO + rutaProducto(p), lastmod: String(p.actualizado_en || '').slice(0, 10) || null }))
+    ...productos.map(p => ({ loc: SITIO + rutaProducto(p), lastmod: String(p.actualizado_en || '').slice(0, 10) || null, foto: p.foto_url }))
   ];
-  const cuerpo = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-    + urls.map(u => `  <url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}</url>`).join('\n')
+  // La foto de cada producto va como <image:image>, para que Google Imágenes la encuentre.
+  const cuerpo = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
+    + urls.map(u => `  <url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}`
+      + `${u.foto ? `<image:image><image:loc>${xml(u.foto)}</image:loc></image:image>` : ''}</url>`).join('\n')
     + '\n</urlset>\n';
   return new Response(cuerpo, { headers: cabeceras('application/xml; charset=utf-8') });
 }
@@ -131,7 +134,7 @@ function noEncontrado() {
   }), { status: 404, headers: { ...cabeceras('text/html; charset=utf-8'), 'Cache-Control': 'public, max-age=60' } });
 }
 
-export function htmlProducto(p, relacionados, env) {
+function htmlProducto(p, relacionados, env) {
   const WA = (env && env.WHATSAPP) || '51956543522';
   const url = SITIO + rutaProducto(p);
   const conPrecio = p.precio != null;
