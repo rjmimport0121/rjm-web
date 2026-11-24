@@ -506,31 +506,106 @@
     <button type="button" class="ic-btn" data-cerrar aria-label="Cerrar carrito"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
   </div>
   <div class="cajon-cuerpo">
-    <p class="c-deshacer" id="carritoDeshacer" role="status"></p>
-    <ul class="c-items" id="carritoItems"></ul>
-    <div class="carrito-vacio" id="carritoVacio">
-      <span class="vacio-ic"><svg class="ic" aria-hidden="true"><use href="#i-shopping-cart"/></svg></span>
-      <b>Tu carrito está vacío</b>
-      <p>Agrega productos con el botón <span class="ui">Agregar</span> y envía tu pedido por WhatsApp.</p>
-      <button type="button" class="btn btn-naranja" data-cerrar data-ir="#catalogo">Ver productos</button>
+    <div id="pasoCarrito">
+      <p class="c-deshacer" id="carritoDeshacer" role="status"></p>
+      <ul class="c-items" id="carritoItems"></ul>
+      <div class="carrito-vacio" id="carritoVacio">
+        <span class="vacio-ic"><svg class="ic" aria-hidden="true"><use href="#i-shopping-cart"/></svg></span>
+        <b>Tu carrito está vacío</b>
+        <p>Agrega productos con el botón <span class="ui">Agregar</span> y envía tu pedido por WhatsApp.</p>
+        <button type="button" class="btn btn-naranja" data-cerrar data-ir="#catalogo">Ver productos</button>
+      </div>
     </div>
+    <!-- Paso 2: datos de envío. La web no los guarda: van en el mensaje de WhatsApp y en el PDF. -->
+    <form class="paso-envio" id="pasoEnvio" hidden novalidate>
+      <button type="button" class="enlace volver" id="volverCarrito"><svg class="ic" aria-hidden="true"><use href="#i-chevron-left"/></svg>Volver al carrito</button>
+      <fieldset class="envio">
+        <legend class="c-label">Envío</legend>
+        <label class="envio-op"><input type="radio" name="envio" value="shalom" checked/><span><b>Agencia Shalom</b><small>A todo el Perú</small></span></label>
+        <label class="envio-op"><input type="radio" name="envio" value="otra"/><span><b>Otra agencia</b><small>Consúltala por WhatsApp</small></span></label>
+      </fieldset>
+      <p class="envio-nota" id="envioNota" hidden>Te confirmamos por WhatsApp si podemos enviar con esa agencia y cuánto cuesta.</p>
+
+      <fieldset class="e-grupo">
+        <legend class="e-tit">¿Quién recoge el pedido?</legend>
+        <div class="e-campo">
+          <label class="c-label" for="eNombre">Nombres y apellidos</label>
+          <input id="eNombre" class="c-input" autocomplete="name" maxlength="80" required aria-describedby="eNombreErr"/>
+          <p class="e-err" id="eNombreErr"></p>
+        </div>
+        <div class="e-fila">
+          <div class="e-campo e-tipo">
+            <label class="c-label" for="eDocTipo">Documento</label>
+            <select id="eDocTipo" class="c-input"><option value="DNI">DNI</option><option value="CE">Carné de extranjería</option></select>
+          </div>
+          <div class="e-campo">
+            <label class="c-label" for="eDoc">Número</label>
+            <input id="eDoc" class="c-input" inputmode="numeric" maxlength="12" autocomplete="off" required aria-describedby="eDocErr"/>
+            <p class="e-err" id="eDocErr"></p>
+          </div>
+        </div>
+        <div class="e-campo">
+          <label class="c-label" for="eCel">Celular</label>
+          <input id="eCel" class="c-input" type="tel" inputmode="tel" maxlength="16" autocomplete="tel-national" placeholder="9 dígitos" required aria-describedby="eCelErr"/>
+          <p class="e-err" id="eCelErr"></p>
+        </div>
+      </fieldset>
+
+      <fieldset class="e-grupo">
+        <legend class="e-tit">¿A qué agencia lo enviamos?</legend>
+        <div class="e-campo">
+          <label class="c-label" for="eDepto">Departamento</label>
+          <select id="eDepto" class="c-input" required aria-describedby="eDeptoErr">
+          <option value="">Elige…</option>
+          <option>Amazonas</option>
+          <option>Áncash</option>
+          <option>Apurímac</option>
+          <option>Arequipa</option>
+          <option>Ayacucho</option>
+          <option>Cajamarca</option>
+          <option>Callao</option>
+          <option>Cusco</option>
+          <option>Huancavelica</option>
+          <option>Huánuco</option>
+          <option>Ica</option>
+          <option>Junín</option>
+          <option>La Libertad</option>
+          <option>Lambayeque</option>
+          <option>Lima</option>
+          <option>Loreto</option>
+          <option>Madre de Dios</option>
+          <option>Moquegua</option>
+          <option>Pasco</option>
+          <option>Piura</option>
+          <option>Puno</option>
+          <option>San Martín</option>
+          <option>Tacna</option>
+          <option>Tumbes</option>
+          <option>Ucayali</option>
+          </select>
+          <p class="e-err" id="eDeptoErr"></p>
+        </div>
+        <div class="e-campo">
+          <label class="c-label" for="eAgencia" id="tAgencia">Agencia Shalom donde recogerás</label>
+          <input id="eAgencia" class="c-input" maxlength="140" required aria-describedby="eAgenciaAyuda eAgenciaErr" placeholder="Nombre o dirección de la agencia"/>
+          <p class="e-ayuda" id="eAgenciaAyuda"><a href="https://shalom.com.pe/agencias/" target="_blank" rel="noopener" id="enlaceAgencias">Busca tu agencia en el mapa de Shalom</a> y copia aquí su nombre o dirección.</p>
+          <p class="e-err" id="eAgenciaErr"></p>
+        </div>
+      </fieldset>
+
+      <label class="c-label" for="carritoComentario">Comentario (opcional)</label>
+      <textarea id="carritoComentario" rows="2" maxlength="400" placeholder="Para qué instrumento, alguna duda…"></textarea>
+      <p class="e-privacidad">Usamos estos datos solo para preparar tu envío. Esta web no los guarda: viajan en tu mensaje de WhatsApp.</p>
+    </form>
   </div>
   <div class="cajon-pie" id="carritoPie" hidden>
     <div class="carrito-total"><span>Subtotal <small>IGV incluido</small></span><b id="carritoTotal">S/ 0.00</b></div>
     <p class="carrito-nota" id="carritoNota" hidden></p>
-    <fieldset class="envio">
-      <legend class="c-label">Envío</legend>
-      <label class="envio-op"><input type="radio" name="envio" value="shalom" checked/><span><b>Agencia Shalom</b><small>A todo el Perú</small></span></label>
-      <label class="envio-op"><input type="radio" name="envio" value="otra"/><span><b>Otra agencia</b><small>Consúltala por WhatsApp</small></span></label>
-    </fieldset>
-    <label class="c-label" for="carritoDestino" id="tDestino">Ciudad de destino</label>
-    <input id="carritoDestino" class="c-input" maxlength="120" autocomplete="address-level2" placeholder="Ej.: Lima, Cusco, Huancayo"/>
-    <p class="envio-nota" id="envioNota" hidden>Te confirmamos por WhatsApp si podemos enviar con esa agencia y cuánto cuesta.</p>
-    <label class="c-label" for="carritoComentario">Comentario (opcional)</label>
-    <textarea id="carritoComentario" rows="2" maxlength="400" placeholder="Para qué instrumento, alguna duda…"></textarea>
-    <button type="button" class="btn btn-wa btn-l btn-ancho" id="carritoEnviar"><svg class="ic" aria-hidden="true"><use href="#i-whatsapp"/></svg>Enviar pedido por WhatsApp</button>
-    <p class="carrito-aviso">Te confirmamos stock, precio final y envío por WhatsApp.</p>
-    <div class="carrito-otros">
+    <button type="button" class="btn btn-naranja btn-l btn-ancho" id="carritoContinuar">Continuar con el envío<svg class="ic" aria-hidden="true"><use href="#i-arrow-right"/></svg></button>
+    <button type="button" class="btn btn-wa btn-l btn-ancho" id="carritoEnviar" hidden><svg class="ic" aria-hidden="true"><use href="#i-whatsapp"/></svg>Enviar pedido por WhatsApp</button>
+    <button type="button" class="btn btn-borde btn-ancho" id="carritoPdf" hidden><svg class="ic" aria-hidden="true"><use href="#i-file-text"/></svg><span>Descargar pedido en PDF</span></button>
+    <p class="carrito-aviso" id="carritoAviso">Te confirmamos stock, precio final y envío por WhatsApp.</p>
+    <div class="carrito-otros" id="carritoOtros">
       <button type="button" class="enlace" data-cerrar>Seguir comprando</button>
       <button type="button" class="enlace enlace-tenue" id="carritoVaciar">Vaciar carrito</button>
     </div>
