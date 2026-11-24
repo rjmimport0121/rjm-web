@@ -134,6 +134,39 @@ async function sitemap(env) {
 }
 
 // ---------- /producto/<nombre>/<id> ----------
+// Ancho y alto de la foto principal, para og:image:width/height. Facebook pide
+// esos datos para mostrar la foto la primera vez que se comparte el enlace.
+// Lee solo los primeros 64 KB del archivo (JPEG o PNG); si falla, no los pone.
+async function tamanoImagen(url) {
+  const corte = new AbortController(), t = setTimeout(() => corte.abort(), 3000);
+  try {
+    const r = await fetch(url, { headers: { Range: 'bytes=0-65535' }, signal: corte.signal });
+    if (!r.ok || !r.body) return null;
+    const lector = r.body.getReader(), partes = []; let total = 0;
+    while (total < 65536) { const { done, value } = await lector.read(); if (done) break; partes.push(value); total += value.length; }
+    lector.cancel().catch(() => {});
+    const b = new Uint8Array(total); let o = 0; partes.forEach(x => { b.set(x, o); o += x.length; });
+    return medidas(b);
+  } catch (_) { return null; } finally { clearTimeout(t); }
+}
+function medidas(b) {
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 && b.length > 24) {
+    const v = new DataView(b.buffer); return { ancho: v.getUint32(16), alto: v.getUint32(20), tipo: 'image/png' };
+  }
+  if (b[0] !== 0xff || b[1] !== 0xd8) return null;
+  let i = 2;
+  while (i + 9 < b.length) {
+    if (b[i] !== 0xff) { i++; continue; }
+    const m = b[i + 1], largo = (b[i + 2] << 8) | b[i + 3];
+    if (m >= 0xc0 && m <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(m)) {
+      return { alto: (b[i + 5] << 8) | b[i + 6], ancho: (b[i + 7] << 8) | b[i + 8], tipo: 'image/jpeg' };
+    }
+    if (m === 0xd8 || m === 0x01 || (m >= 0xd0 && m <= 0xd7)) { i += 2; continue; }
+    i += 2 + largo;
+  }
+  return null;
+}
+
 async function paginaProducto(url, env) {
   const partes = url.pathname.split('/').filter(Boolean); // ['producto', nombre?, id]
   const id = partes[partes.length - 1];
@@ -146,11 +179,15 @@ async function paginaProducto(url, env) {
   const canonica = rutaProducto(p);
   if (url.pathname !== canonica) return Response.redirect(SITIO + canonica, 301);
 
-  const relacionados = await supabase(env,
-    `productos?select=id,nombre,marca,precio,moneda,foto_url&publicado=eq.true&categoria=eq.${encodeURIComponent(p.categoria)}&id=neq.${p.id}&order=destacado.desc,orden.asc,nombre.asc&limit=4`
-  ).catch(() => []);
+  const principal = fotosDe(p)[0];
+  const [relacionados, dim] = await Promise.all([
+    supabase(env,
+      `productos?select=id,nombre,marca,precio,moneda,foto_url&publicado=eq.true&categoria=eq.${encodeURIComponent(p.categoria)}&id=neq.${p.id}&order=destacado.desc,orden.asc,nombre.asc&limit=4`
+    ).catch(() => []),
+    principal ? tamanoImagen(principal) : null
+  ]);
 
-  return new Response(htmlProducto(p, relacionados, env), { headers: cabeceras('text/html; charset=utf-8') });
+  return new Response(htmlProducto(p, relacionados, env, dim), { headers: cabeceras('text/html; charset=utf-8') });
 }
 
 function noEncontrado() {
@@ -160,7 +197,7 @@ function noEncontrado() {
   }), { status: 404, headers: { ...cabeceras('text/html; charset=utf-8'), 'Cache-Control': 'public, max-age=60' } });
 }
 
-function htmlProducto(p, relacionados, env) {
+function htmlProducto(p, relacionados, env, dim) {
   const WA = (env && env.WHATSAPP) || '51956543522';
   const url = SITIO + rutaProducto(p);
   const conPrecio = p.precio != null;
@@ -257,7 +294,14 @@ function htmlProducto(p, relacionados, env) {
 
   return pagina({
     titulo, descripcion, canonica: url, robots: 'index, follow',
-    og: { tipo: 'product', imagen: fotos[0], titulo: p.nombre, precio: conPrecio ? Number(p.precio).toFixed(2) : null, moneda: p.moneda === 'USD' ? 'USD' : 'PEN' },
+    // Facebook y WhatsApp no muestran el precio por su cuenta: va en el título y al
+    // inicio de la descripción de la vista previa.
+    og: {
+      tipo: 'product', imagen: fotos[0], dim: fotos[0] ? dim : { ancho: 1200, alto: 630, tipo: 'image/jpeg' }, alt: p.nombre,
+      titulo: conPrecio ? `${p.nombre} · ${precioTxt}` : p.nombre,
+      descripcion: recortar(`${conPrecio ? `${precioTxt} (${igvTxt}). ` : 'Precio a consultar. '}${p.descripcion ? p.descripcion + ' ' : ''}Envíos a todo el Perú por agencia Shalom.`, 200),
+      precio: conPrecio ? Number(p.precio).toFixed(2) : null, moneda: p.moneda === 'USD' ? 'USD' : 'PEN'
+    },
     jsonld: conPrecio ? [producto, migas] : [migas], cuerpo,
     script: fotos.length > 1 ? GALERIA_JS : ''
   });
@@ -275,9 +319,11 @@ function pagina({ titulo, descripcion, canonica, robots, og, jsonld = [], cuerpo
 <meta property="og:locale" content="es_PE"/>
 <meta property="og:site_name" content="RJM Import-Export"/>
 <meta property="og:title" content="${esc(og.titulo)}"/>
-<meta property="og:description" content="${esc(descripcion)}"/>
+<meta property="og:description" content="${esc(og.descripcion || descripcion)}"/>
 <meta property="og:url" content="${esc(canonica)}"/>
 <meta property="og:image" content="${esc(og.imagen || SITIO + '/img/og-rjm.jpg')}"/>
+${og.dim && og.dim.ancho && og.dim.alto ? `<meta property="og:image:width" content="${og.dim.ancho}"/>\n<meta property="og:image:height" content="${og.dim.alto}"/>\n<meta property="og:image:type" content="${og.dim.tipo}"/>` : ''}
+${og.alt ? `<meta property="og:image:alt" content="${esc(og.alt)}"/>` : ''}
 ${og.precio ? `<meta property="product:price:amount" content="${og.precio}"/>\n<meta property="product:price:currency" content="${og.moneda}"/>` : ''}
 <meta name="twitter:card" content="${og.imagen ? 'summary_large_image' : 'summary'}"/>` : '';
   return `<!DOCTYPE html>
