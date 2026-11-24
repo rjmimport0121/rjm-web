@@ -175,9 +175,15 @@
       <div class="campo"><label for="pOrden">Orden</label><input id="pOrden" type="number" step="1" value="0"/></div>
     </div>
     <div class="campo">
-      <label for="pFoto">Foto (JPG, PNG o WebP)</label>
-      <input id="pFoto" type="file" accept="image/jpeg,image/png,image/webp"/>
-      <img id="pFotoPrev" class="foto-prev oculto" alt="Vista previa"/>
+      <label for="pFotos">Fotos (hasta 4; la primera es la principal)</label>
+      <ul class="galeria-edit" id="pGaleria" aria-label="Fotos del producto"></ul>
+      <input id="pFotos" type="file" accept="image/jpeg,image/png,image/webp" multiple/>
+      <small class="ayuda" id="pFotosInfo">JPG, PNG o WebP. Se reducen solas para que carguen rápido.</small>
+    </div>
+    <div class="campo">
+      <label for="pVideo">Video (opcional): enlace de YouTube, TikTok o Facebook</label>
+      <input id="pVideo" type="url" inputmode="url" maxlength="300" placeholder="https://www.youtube.com/watch?v=…"/>
+      <small class="ayuda" id="pVideoInfo">Sube el video a tu red y pega aquí su enlace. Se verá dentro de la ficha del producto.</small>
     </div>
     <div class="fila">
       <label class="check"><input type="checkbox" id="pPublicado" checked/> Visible en la web</label>

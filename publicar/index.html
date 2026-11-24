@@ -73,16 +73,18 @@
           <span>Toma la foto con buena luz y el producto centrado.</span>
         </div>
         <img id="fotoVista" alt="Foto del producto" hidden/>
+        <span class="foto-n" id="fotoN" hidden></span>
       </div>
+      <ul class="minis" id="fotoMinis" aria-label="Fotos del producto" hidden></ul>
       <div class="dos-btn">
         <label class="btn btn-principal archivo" for="fCamara">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>Tomar foto
           <input id="fCamara" type="file" accept="image/*" capture="environment"/></label>
         <label class="btn btn-sec archivo" for="fGaleria">
           <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/></svg>Galería
-          <input id="fGaleria" type="file" accept="image/*"/></label>
+          <input id="fGaleria" type="file" accept="image/*" multiple/></label>
       </div>
-      <p class="tenue centro">La foto se reduce sola para que cargue rápido en la web.</p>
+      <p class="tenue centro" id="fotoAyuda">Hasta 4 fotos: la primera es la principal. Se reducen solas para que carguen rápido.</p>
     </section>
 
     <!-- ============ 2 · DATOS ============ -->
@@ -111,6 +113,9 @@
             <button type="button" data-frase="Stock limitado.">+ Stock limitado</button>
             <button type="button" data-frase="Precio especial por mayor.">+ Precio por mayor</button>
           </div></div>
+        <div class="campo"><label for="dVideo">Video (opcional)</label>
+          <input id="dVideo" type="url" inputmode="url" maxlength="300" autocomplete="off" placeholder="Enlace de YouTube, TikTok o Facebook"/>
+          <small class="error" id="eVideo"></small></div>
         <label class="opcion"><span><b>Destacado</b><small>Aparece arriba, en "Destacados y novedades"</small></span>
           <span class="interruptor"><input type="checkbox" id="dDestacado"/><i></i></span></label>
       </form>

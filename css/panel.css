@@ -79,6 +79,17 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
 .tramos{display:grid;gap:.5rem}
 .tramo{display:grid;grid-template-columns:1fr 1fr auto;gap:.5rem;align-items:end}
 .foto-prev{width:120px;height:120px;object-fit:cover;border:1px solid var(--border);background:var(--surface);margin-top:.5rem}
+.galeria-edit{list-style:none;padding:0;margin:.2rem 0 .6rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:.6rem}
+.galeria-edit:empty{display:none}
+.galeria-edit li{position:relative;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface)}
+.galeria-edit img{display:block;width:100%;aspect-ratio:1;object-fit:cover}
+.galeria-edit .g-etq{position:absolute;top:6px;left:6px;font-size:.7rem;font-weight:700;padding:2px 7px;border-radius:999px;background:var(--cyan);color:#04101c}
+.galeria-edit .g-acc{display:flex;justify-content:space-between;gap:4px;padding:4px}
+.galeria-edit .g-acc button{min-width:40px;min-height:36px;border-radius:8px;border:1px solid var(--border);background:transparent;color:inherit;cursor:pointer;font-size:1rem}
+.galeria-edit .g-acc button:disabled{opacity:.35;cursor:default}
+.campo .ayuda{display:block;font-size:.8rem;opacity:.8;margin-top:.35rem}
+.campo .ayuda.err{color:#fca5a5;opacity:1}
+.campo .ayuda.ok{color:#86efac;opacity:1}
 
 .modal-fondo{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:flex-start;justify-content:center;padding:4vh 1rem;overflow-y:auto}
 .modal{background:var(--panel);border:1px solid var(--border);width:100%;max-width:640px;padding:1.5rem}

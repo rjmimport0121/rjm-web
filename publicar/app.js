@@ -10,7 +10,7 @@
   const OTRO = '__otro__';
   const SITIO = (cfg.SITIO_URL || 'https://www.rjmimport.com/').replace(/\/?$/, '/');
   const BORRADOR = 'rjm_publicar_borrador_v1';
-  const CAMPOS = ['dNombre', 'dPrecio', 'dSku', 'dGrupo', 'dSub', 'dSubOtro', 'dMarca', 'dMarcaOtra', 'dDesc'];
+  const CAMPOS = ['dNombre', 'dPrecio', 'dSku', 'dGrupo', 'dSub', 'dSubOtro', 'dMarca', 'dMarcaOtra', 'dDesc', 'dVideo'];
   const VISTAS = {
     inicio: { el: 'vInicio', titulo: 'RJM Publicar', sub: '' },
     foto: { el: 'vFoto', titulo: 'Nuevo producto', sub: 'Paso 1 de 3 · Foto', n: 1, accion: 'Continuar' },
@@ -18,7 +18,9 @@
     destino: { el: 'vDestino', titulo: 'Nuevo producto', sub: 'Paso 3 de 3 · Dónde publicar', n: 3, accion: 'Publicar' },
     listo: { el: 'vListo', titulo: 'Publicado', sub: '', accion: 'Publicar otro producto' },
   };
-  let perfil = null, vista = null, foto = null, fotoUrl = null, publicado = null, avisoInstalar = null;
+  // fotos: [{ blob, url }] (máx. 4); la primera es la principal.
+  const MAX_FOTOS = 4;
+  let perfil = null, vista = null, fotos = [], publicado = null, avisoInstalar = null;
 
   // ---------- Avisos y vibración (solo en momentos importantes) ----------
   const vibrar = patron => { try { navigator.vibrate && navigator.vibrate(patron); } catch (_) {} };
@@ -60,7 +62,7 @@
   function actualizarAccion() {
     const b = $('btnSiguiente'), conf = VISTAS[vista];
     if (!conf || !conf.accion) return;
-    b.textContent = vista === 'foto' && !foto ? 'Continuar sin foto' : conf.accion;
+    b.textContent = vista === 'foto' && !fotos.length ? 'Continuar sin foto' : conf.accion;
     b.disabled = vista === 'destino' && !$('xWeb').checked && !$('xMay').checked;
   }
 
@@ -101,7 +103,7 @@
   }
 
   // ---------- Inicio: últimas publicaciones ----------
-  const enlaceProducto = id => SITIO + '#producto=' + id;
+  const enlaceProducto = p => SITIO + RJM.rutaProducto(p);
   async function cargarRecientes() {
     const { data, error } = await sb.from('productos').select('id, nombre, precio, moneda, foto_url, publicado, creado_en')
       .order('creado_en', { ascending: false }).limit(8);
@@ -115,7 +117,7 @@
           <div class="rec-sub">${p.precio != null ? esc(precio(p.precio, p.moneda)) : 'A consultar'}
             <span class="pill ${p.publicado ? 'ok' : 'off'}">${p.publicado ? 'Visible' : 'Oculto'}</span></div>
         </div>
-        ${p.publicado ? `<a class="rec-ver" href="${esc(enlaceProducto(p.id))}" target="_blank" rel="noopener" aria-label="Ver ${esc(p.nombre)} en la web">Ver</a>` : '<span></span>'}
+        ${p.publicado ? `<a class="rec-ver" href="${esc(enlaceProducto(p))}" target="_blank" rel="noopener" aria-label="Ver ${esc(p.nombre)} en la web">Ver</a>` : '<span></span>'}
       </li>`).join('') : '<li class="vacio">Aún no publicaste productos. Empieza con "Nuevo producto".</li>';
   }
   $('btnNuevo').addEventListener('click', () => { if (!borradorTieneDatos()) limpiarFormulario(); ir('foto'); });
@@ -137,18 +139,39 @@
     });
   }
   async function elegirFoto(input) {
-    const f = input.files && input.files[0]; input.value = '';
-    if (!f) return;
+    const lista = [...(input.files || [])]; input.value = '';
+    if (!lista.length) return;
+    const libres = MAX_FOTOS - fotos.length;
+    if (lista.length > libres) toast(`Solo caben ${MAX_FOTOS} fotos por producto: se agregaron ${libres}.`);
     try {
       cubierta('Preparando la foto…');
-      foto = await reducirImagen(f);
-      if (fotoUrl) URL.revokeObjectURL(fotoUrl);
-      fotoUrl = URL.createObjectURL(foto);
-      $('fotoVista').src = fotoUrl; $('fotoVista').hidden = false; $('fotoVacia').hidden = true;
-      actualizarAccion();
+      for (const f of lista.slice(0, libres)) { const blob = await reducirImagen(f); fotos.push({ blob, url: URL.createObjectURL(blob) }); }
     } catch (e) { toast(e.message, 'error'); }
-    finally { cubierta(''); }
+    finally { cubierta(''); pintarFotos(); }
   }
+  function pintarFotos() {
+    const hay = fotos.length > 0;
+    $('fotoVista').hidden = !hay; $('fotoVacia').hidden = hay;
+    if (hay) $('fotoVista').src = fotos[0].url; else $('fotoVista').removeAttribute('src');
+    $('fotoN').hidden = !hay; $('fotoN').textContent = `${fotos.length} de ${MAX_FOTOS}`;
+    $('fotoMinis').hidden = !hay;
+    $('fotoMinis').innerHTML = fotos.map((f, i) => `<li><img src="${f.url}" alt="Foto ${i + 1}${i ? '' : ' (principal)'}"/>
+      ${i ? `<button type="button" data-principal="${i}" aria-label="Usar la foto ${i + 1} como principal">★</button>` : '<span class="mini-etq">Principal</span>'}
+      <button type="button" class="mini-quitar" data-quitar="${i}" aria-label="Quitar la foto ${i + 1}">✕</button></li>`).join('');
+    const lleno = fotos.length >= MAX_FOTOS;
+    ['fCamara', 'fGaleria'].forEach(id => { $(id).disabled = lleno; $(id).closest('label').classList.toggle('apagado', lleno); });
+    $('fotoAyuda').textContent = lleno ? 'Listo: 4 fotos. Quita una si quieres cambiarla.'
+      : hay ? `Puedes agregar ${MAX_FOTOS - fotos.length} foto${MAX_FOTOS - fotos.length === 1 ? '' : 's'} más (de otros ángulos, la caja, el detalle).`
+      : 'Hasta 4 fotos: la primera es la principal. Se reducen solas para que carguen rápido.';
+    actualizarAccion();
+  }
+  $('fotoMinis').addEventListener('click', e => {
+    const q = e.target.closest('[data-quitar]'), pr = e.target.closest('[data-principal]');
+    if (q) { const [f] = fotos.splice(+q.dataset.quitar, 1); if (f) URL.revokeObjectURL(f.url); }
+    else if (pr) { const [f] = fotos.splice(+pr.dataset.principal, 1); fotos.unshift(f); }
+    else return;
+    pintarFotos();
+  });
   $('fCamara').addEventListener('change', e => elegirFoto(e.target));
   $('fGaleria').addEventListener('change', e => elegirFoto(e.target));
 
@@ -168,6 +191,7 @@
     const d = $('dDesc'); d.value = (d.value.trim() + ' ' + b.dataset.frase).trim(); guardarBorrador();
   }));
   $('dNombre').addEventListener('input', () => errorCampo('eNombre', ''));
+  $('dVideo').addEventListener('input', () => errorCampo('eVideo', ''));
 
   function datos() {
     const sub = $('dSub').value === OTRO ? $('dSubOtro').value.trim() : $('dSub').value;
@@ -177,7 +201,7 @@
       nombre: $('dNombre').value.trim(), sku: $('dSku').value.trim() || null,
       grupo: $('dGrupo').value || null, categoria: sub || null, marca: marca || null,
       descripcion: $('dDesc').value.trim() || null, precio: p === '' ? null : Math.round(Number(p) * 100) / 100,
-      destacado: $('dDestacado').checked,
+      destacado: $('dDestacado').checked, video_url: $('dVideo').value.trim() || null,
     };
   }
   function validarDatos() {
@@ -185,6 +209,7 @@
     if (!d.nombre) { errorCampo('eNombre', 'Escribe el nombre del producto.'); ok = false; }
     if (!d.grupo || !d.categoria) { errorCampo('eSub', 'Elige el grupo y el subgrupo (o escribe uno nuevo).'); ok = false; }
     if (d.precio != null && (isNaN(d.precio) || d.precio < 0)) { toast('Revisa el precio.', 'error'); ok = false; }
+    if (d.video_url && !RJM.video(d.video_url)) { errorCampo('eVideo', 'Pega un enlace de YouTube, TikTok o Facebook (empieza con https://).'); ok = false; }
     if (!ok) { const primero = document.querySelector('#vDatos .invalido input, #vDatos .invalido select'); primero?.focus(); }
     return ok;
   }
@@ -199,16 +224,15 @@
     llenarSub();
     if (!b) return;
     if (b.dGrupo) { $('dGrupo').value = b.dGrupo; llenarSub(b.dSub); }
-    ['dNombre', 'dPrecio', 'dSku', 'dSubOtro', 'dMarca', 'dMarcaOtra', 'dDesc'].forEach(id => { if (b[id] != null) $(id).value = b[id]; });
+    ['dNombre', 'dPrecio', 'dSku', 'dSubOtro', 'dMarca', 'dMarcaOtra', 'dDesc', 'dVideo'].forEach(id => { if (b[id] != null) $(id).value = b[id]; });
     $('dSubOtro').hidden = $('dSub').value !== OTRO; $('dMarcaOtra').hidden = $('dMarca').value !== OTRO;
     $('dDestacado').checked = !!b.dDestacado;
     if (borradorTieneDatos()) toast('Recuperamos el producto que dejaste a medias.');
   }
   function limpiarFormulario() {
     $('formDatos').reset(); $('dGrupo').value = ''; llenarSub(); $('dSubOtro').hidden = true; $('dMarcaOtra').hidden = true;
-    ['eNombre', 'eSub'].forEach(id => errorCampo(id, ''));
-    foto = null; if (fotoUrl) URL.revokeObjectURL(fotoUrl); fotoUrl = null;
-    $('fotoVista').hidden = true; $('fotoVista').removeAttribute('src'); $('fotoVacia').hidden = false;
+    ['eNombre', 'eSub', 'eVideo'].forEach(id => errorCampo(id, ''));
+    fotos.forEach(f => URL.revokeObjectURL(f.url)); fotos = []; pintarFotos();
     $('xWeb').checked = true; $('xMay').checked = false; $('bloqueMay').hidden = true;
     $('mStock').value = '10'; $('mUnidad').value = 'und'; $('mP1').value = ''; $('mP12').value = ''; $('eMay').textContent = '';
     try { localStorage.removeItem(BORRADOR); } catch (_) {}
@@ -225,7 +249,7 @@
   });
   function actualizarPrevia() {
     const d = datos();
-    $('previaImg').innerHTML = fotoUrl ? `<img src="${fotoUrl}" alt=""/>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>';
+    $('previaImg').innerHTML = fotos.length ? `<img src="${fotos[0].url}" alt=""/>` : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg>';
     $('previaCat').textContent = [d.categoria, d.marca].filter(Boolean).join(' · ');
     $('previaNom').textContent = d.nombre;
     $('previaPrecio').innerHTML = d.precio != null ? esc(precio(d.precio, 'PEN')) + '<small>IGV incluido</small>' : '<span class="consultar">Precio a consultar</span>';
@@ -254,26 +278,29 @@
       stock = parseInt($('mStock').value, 10); p1 = Number($('mP1').value); p12 = $('mP12').value === '' ? null : Number($('mP12').value);
       if (!(stock >= 0) || !(p1 > 0) || (p12 != null && !(p12 > 0))) { $('eMay').textContent = 'Revisa el stock y el precio desde 1 (mayor a 0).'; return; }
     }
-    const hechos = []; let subida = null, idWeb = null;
+    const hechos = []; const subidas = []; let idWeb = null;
     try {
-      if (web && foto) {
-        cubierta('Subiendo la foto…');
-        const ruta = `catalogo/${crypto.randomUUID()}.jpg`;
-        const { error } = await sb.storage.from('productos').upload(ruta, foto, { contentType: 'image/jpeg', cacheControl: '31536000' });
-        if (error) throw error;
-        subida = { ruta, url: sb.storage.from('productos').getPublicUrl(ruta).data.publicUrl };
+      if (web) {
+        for (const [i, f] of fotos.entries()) {
+          cubierta(fotos.length > 1 ? `Subiendo foto ${i + 1} de ${fotos.length}…` : 'Subiendo la foto…');
+          const ruta = `catalogo/${crypto.randomUUID()}.jpg`;
+          const { error } = await sb.storage.from('productos').upload(ruta, f.blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+          if (error) throw error;
+          subidas.push({ path: ruta, url: sb.storage.from('productos').getPublicUrl(ruta).data.publicUrl });
+        }
       }
       if (web) {
         cubierta('Publicando en la web…');
+        const [principal, ...extra] = subidas;
         const fila = { ...d, caracteristicas: [], moneda: 'PEN', precio_incluye_igv: true, publicado: true, orden: 0,
-          foto_url: subida ? subida.url : null, foto_path: subida ? subida.ruta : null };
+          foto_url: principal ? principal.url : null, foto_path: principal ? principal.path : null, fotos_extra: extra };
         const { data, error } = await sb.from('productos').insert(fila).select('id').single();
         if (error) throw error;
         idWeb = data.id; hechos.push('Catálogo de la web' + (d.destacado ? ' (destacado)' : ''));
       }
     } catch (e) {
       cubierta('');
-      if (subida) await sb.storage.from('productos').remove([subida.ruta]).catch(() => {});
+      if (subidas.length) await sb.storage.from('productos').remove(subidas.map(s => s.path)).catch(() => {});
       toast('No se pudo publicar: ' + textoError(e), 'error'); return;
     }
     let avisoMay = '';
@@ -294,8 +321,8 @@
     }
     cubierta('');
     if (!hechos.length) { toast(avisoMay || 'No se publicó nada.', 'error'); return; }
-    const enlace = idWeb ? enlaceProducto(idWeb) : '';
-    publicado = { nombre: d.nombre, texto: textoPublicacion(d, enlace), enlace, foto };
+    const enlace = idWeb ? enlaceProducto({ id: idWeb, nombre: d.nombre }) : '';
+    publicado = { nombre: d.nombre, texto: textoPublicacion(d, enlace), enlace, foto: fotos.length ? fotos[0].blob : null };
     $('listoLista').innerHTML = hechos.map(h => `<li>${esc(h)}</li>`).join('');
     $('textoPub').textContent = publicado.texto;
     $('btnVer').hidden = !enlace; if (enlace) $('btnVer').href = enlace;

@@ -536,13 +536,56 @@
 
   // ---------- Ficha de producto (con enlace directo #producto=…) ----------
   const ficha = $('ficha');
+  // Galería de la ficha: hasta 4 fotos (foto_url + fotos_extra) y un video por enlace.
+  let media = [], mediaSel = 0;
+  function mediaDe(p) {
+    const l = [];
+    if (p.foto_url) l.push({ tipo: 'foto', url: p.foto_url });
+    (Array.isArray(p.fotos_extra) ? p.fotos_extra : []).forEach(f => { if (f && f.url) l.push({ tipo: 'foto', url: f.url }); });
+    const v = p.video_url && RJM.video ? RJM.video(p.video_url) : null;
+    if (v) l.push({ tipo: 'video', ...v });
+    return l;
+  }
+  function pintarMedia(p) {
+    const g = lineaDe(p), l = datosLinea(g), m = media[mediaSel];
+    const fotos = media.filter(x => x.tipo === 'foto').length;
+    let html;
+    if (!m) html = `<div class="sinfoto ${l.clase}">${icono(l.ic)}<span>${esc(p.categoria || l.corto)}</span></div>`;
+    else if (m.tipo === 'foto') html = `<img src="${esc(m.url)}" alt="${esc(p.nombre)}${fotos > 1 ? ` (foto ${mediaSel + 1} de ${fotos})` : ''}" width="800" height="800"/>`;
+    else html = `<div class="f-video${m.vertical ? ' vertical' : ''}"><iframe src="${esc(m.embed)}" title="Video de ${esc(p.nombre)} en ${esc(m.red)}" loading="lazy"
+      allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`;
+    $('fImg').innerHTML = html + (m && m.tipo === 'video' ? '' : insigniasHTML(p));
+    $('fMinis').hidden = media.length < 2;
+    $('fMinis').innerHTML = media.length < 2 ? '' : media.map((x, i) => `<li><button type="button" data-media="${i}" aria-pressed="${i === mediaSel}"
+      aria-label="${x.tipo === 'video' ? `Ver video en ${esc(x.red)}` : `Ver foto ${i + 1}`}">${x.tipo === 'foto'
+        ? `<img src="${esc(x.url)}" alt="" width="72" height="72" loading="lazy"/>`
+        : `<span class="f-play">${icono('play')}<small>Video</small></span>`}</button></li>`).join('');
+  }
+  $('fMinis').addEventListener('click', e => {
+    const b = e.target.closest('[data-media]'); if (!b) return;
+    const i = +b.dataset.media, m = media[i], p = buscarP(fichaId);
+    if (!m || !p) return;
+    if (m.tipo === 'video' && !m.embed) { window.open(m.enlace, '_blank', 'noopener'); return; } // enlace corto: se abre en la red
+    mediaSel = i; pintarMedia(p);
+    const nuevo = $('fMinis').querySelector(`[data-media="${i}"]`); if (nuevo) nuevo.focus({ preventScroll: true });
+  });
+  // Deslizar con el dedo sobre la foto: siguiente / anterior (solo entre fotos).
+  let toqueX = null;
+  $('fImg').addEventListener('touchstart', e => { toqueX = e.touches[0].clientX; }, { passive: true });
+  $('fImg').addEventListener('touchend', e => {
+    if (toqueX == null) return;
+    const dx = e.changedTouches[0].clientX - toqueX; toqueX = null;
+    const fotos = media.filter(x => x.tipo === 'foto').length, p = buscarP(fichaId);
+    if (Math.abs(dx) < 40 || fotos < 2 || !p || media[mediaSel].tipo !== 'foto') return;
+    mediaSel = (mediaSel + (dx < 0 ? 1 : fotos - 1)) % fotos; pintarMedia(p);
+  }, { passive: true });
   let fichaId = null, fichaPorEnlace = false;
   function abrirFicha(id, porEnlace) {
     const p = buscarP(id); if (!p) return false;
     fichaId = id; fichaPorEnlace = !!porEnlace;
     const g = lineaDe(p), l = datosLinea(g);
-    $('fImg').innerHTML = (p.foto_url ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nombre)}" width="800" height="800"/>`
-      : `<div class="sinfoto ${l.clase}">${icono(l.ic)}<span>${esc(p.categoria || l.corto)}</span></div>`) + insigniasHTML(p);
+    media = mediaDe(p); mediaSel = 0;
+    pintarMedia(p);
     $('fRuta').textContent = [g, p.categoria].filter(Boolean).join(' › ');
     $('fTitulo').textContent = p.nombre;
     $('fMeta').innerHTML = [p.marca && `Marca: <b>${esc(p.marca)}</b>`, p.sku && `Código: <b>${esc(p.sku)}</b>`].filter(Boolean).join(' · ');
@@ -594,6 +637,7 @@
     } catch (_) { /* el visitante canceló */ }
   });
   ficha.addEventListener('close', () => {
+    const v = $('fImg').querySelector('iframe'); if (v) v.remove(); // detiene el video
     const conHash = location.hash.startsWith('#producto=');
     if (conHash && fichaPorEnlace) history.back();
     else if (conHash) history.replaceState(null, '', location.pathname + location.search);
