@@ -230,7 +230,8 @@
   // El cliente llena quién recoge y en qué agencia. Nada de esto se guarda en la
   // web ni en Supabase: va en el mensaje de WhatsApp (listo para copiar y pegar
   // en el facturador y en la guía de Shalom) y en el PDF que puede descargar.
-  // Solo se recuerda en este navegador la agencia elegida, no el nombre ni el DNI.
+  // En el navegador se recuerda la agencia elegida. Nombre, documento y celular
+  // solo si el cliente marca "Recordar mis datos" (y nunca salen de su equipo).
   const CLAVE_ENVIO = 'rjm_envio_v1';
   const envioElegido = () => (document.querySelector('input[name="envio"]:checked') || {}).value || 'shalom';
   const soloDigitos = v => String(v || '').replace(/\D/g, '');
@@ -301,6 +302,43 @@
   ['eDepto', 'eAgencia'].forEach(id => $(id).addEventListener('change', guardarEnvio));
   pintarEnvio();
 
+  // "Recordar mis datos en este equipo": guarda nombre, documento y celular solo
+  // en el navegador del cliente, con su permiso. Al desmarcar se borran.
+  const CLAVE_DATOS = 'rjm_mis_datos_v1';
+  const PERSONALES = ['eNombre', 'eDocTipo', 'eDoc', 'eCel'];
+  function recordarDatos() {
+    if (!$('eRecordar').checked) return;
+    const d = datosEnvio();
+    try { localStorage.setItem(CLAVE_DATOS, JSON.stringify({ nombre: d.nombre, docTipo: d.docTipo, doc: d.doc, cel: d.cel })); } catch (_) {}
+    $('eOlvidar').hidden = false;
+  }
+  function olvidarDatos(limpiarCampos) {
+    if (limpiarCampos) {
+      $('eRecordar').checked = false; // primero, para que limpiar no vuelva a guardar
+      ['eNombre', 'eDoc', 'eCel'].forEach(id => { $(id).value = ''; });
+      $('eDocTipo').value = 'DNI'; $('eDocTipo').dispatchEvent(new Event('change'));
+    }
+    try { localStorage.removeItem(CLAVE_DATOS); } catch (_) {}
+    $('eOlvidar').hidden = true;
+  }
+  try {
+    const mios = JSON.parse(localStorage.getItem(CLAVE_DATOS) || 'null');
+    if (mios && typeof mios === 'object') {
+      if (typeof mios.nombre === 'string') $('eNombre').value = mios.nombre.slice(0, 80);
+      if (mios.docTipo === 'CE' || mios.docTipo === 'DNI') { $('eDocTipo').value = mios.docTipo; $('eDocTipo').dispatchEvent(new Event('change')); }
+      if (typeof mios.doc === 'string') $('eDoc').value = mios.doc.slice(0, 12);
+      if (typeof mios.cel === 'string') $('eCel').value = mios.cel.slice(0, 16);
+      $('eRecordar').checked = true; $('eOlvidar').hidden = false;
+    }
+  } catch (_) { /* sin almacenamiento */ }
+  $('eRecordar').addEventListener('change', () => { if ($('eRecordar').checked) recordarDatos(); else olvidarDatos(false); });
+  PERSONALES.forEach(id => $(id).addEventListener('change', recordarDatos));
+  $('eOlvidar').addEventListener('click', () => {
+    olvidarDatos(true);
+    window.RJM_AVISO('Listo: borramos tus datos de este equipo.');
+    $('eNombre').focus();
+  });
+
   // Cambio de paso dentro del mismo carrito.
   let paso = 'carrito';
   function irAPaso(nuevo) {
@@ -361,7 +399,7 @@
     if (!items.length) return;
     const d = datosEnvio();
     if (!pintarErrores(validarEnvio(d))) return;
-    guardarEnvio();
+    guardarEnvio(); recordarDatos();
     window.open(`https://wa.me/${WA}?text=${encodeURIComponent(mensajePedido(d, refPedido()))}`, '_blank', 'noopener');
   });
   C.mensajePedido = mensajePedido;
