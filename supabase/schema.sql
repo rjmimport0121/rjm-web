@@ -339,3 +339,17 @@ grant update (estado, observaciones, fecha_respuesta, correo_enviado, correo_err
 
 -- Ajuste de seguridad sugerido por Supabase (Security Advisor): fija el search_path.
 alter function public.tocar_actualizado_en() set search_path = public;
+
+-- ------------------------------------------------------------
+-- 10. GALERÍA DE PRODUCTO (ver supabase/galeria.sql)
+-- ------------------------------------------------------------
+alter table public.productos add column if not exists fotos_extra jsonb not null default '[]'::jsonb;
+alter table public.productos add column if not exists video_url text;
+
+alter table public.productos drop constraint if exists productos_fotos_extra_ok;
+alter table public.productos add constraint productos_fotos_extra_ok
+  check (jsonb_typeof(fotos_extra) = 'array' and jsonb_array_length(fotos_extra) <= 3);
+
+alter table public.productos drop constraint if exists productos_video_url_ok;
+alter table public.productos add constraint productos_video_url_ok
+  check (video_url is null or (video_url ~ '^https://' and length(video_url) <= 300));

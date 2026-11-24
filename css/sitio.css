@@ -797,3 +797,18 @@ html.lenis,html.lenis body{height:auto}
 .e-ayuda{font-size:12.5px;color:var(--tenue);margin-top:5px;line-height:1.45}
 .e-ayuda a{color:var(--azul);font-weight:600}
 .e-privacidad{font-size:12px;color:var(--tenue);line-height:1.45}
+
+/* ---------- Ficha: galería de fotos y video ---------- */
+.ficha-media{display:grid;align-content:start;background:#f6f7f9;min-width:0}
+.ficha-minis{list-style:none;margin:0;padding:10px 12px 12px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:thin}
+.ficha-minis button{display:block;width:64px;height:64px;padding:0;border-radius:10px;overflow:hidden;border:2px solid var(--linea-2);background:#fff;cursor:pointer;flex:none;transition:border-color .15s}
+.ficha-minis button[aria-pressed="true"]{border-color:var(--naranja)}
+.ficha-minis button:hover{border-color:var(--naranja-txt)}
+.ficha-minis img{width:100%;height:100%;object-fit:cover}
+.f-play{display:grid;place-items:center;align-content:center;gap:1px;width:100%;height:100%;background:var(--marino);color:#fff}
+.f-play .ic{width:22px;height:22px;fill:currentColor}
+.f-play small{font-size:11px;font-weight:700}
+.f-video{position:absolute;inset:0;display:grid;place-items:center;background:#000}
+.f-video iframe{width:100%;height:100%;border:0}
+.f-video.vertical iframe{width:auto;height:100%;aspect-ratio:9/16;max-width:100%}
+@media(max-width:799px){.ficha-minis{padding:8px 16px 10px}.ficha-minis button{width:56px;height:56px}}

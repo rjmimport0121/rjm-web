@@ -94,6 +94,15 @@ svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-l
 .foto-vacia{display:grid;gap:10px;place-items:center;text-align:center;padding:24px;color:var(--tenue);max-width:28ch}
 .foto-vacia svg{width:52px;height:52px;color:var(--oro);stroke-width:1.6}
 .dos-btn{display:grid;grid-template-columns:1.4fr 1fr;gap:10px}
+.foto-n{position:absolute;top:10px;right:10px;padding:3px 10px;border-radius:999px;background:rgba(5,10,20,.72);color:#fff;font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums}
+.minis{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.minis li{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;border:1.5px solid var(--linea-marca)}
+.minis li:first-child{border-color:var(--oro)}
+.minis img{width:100%;height:100%;object-fit:cover}
+.minis button{position:absolute;bottom:4px;left:4px;width:34px;height:34px;border-radius:50%;border:0;background:rgba(5,10,20,.78);color:#fff;font-size:1rem;cursor:pointer;display:grid;place-items:center}
+.minis .mini-quitar{left:auto;right:4px;top:4px;bottom:auto}
+.minis .mini-etq{position:absolute;left:4px;bottom:4px;padding:2px 6px;border-radius:999px;background:var(--oro);color:#1a1205;font-size:.65rem;font-weight:800}
+.archivo.apagado{opacity:.45;pointer-events:none}
 
 /* ---------- Botones ---------- */
 .btn{display:flex;align-items:center;justify-content:center;gap:10px;min-height:54px;padding:0 18px;border-radius:var(--r);border:0;cursor:pointer;

@@ -47,6 +47,12 @@
 
   // ---------------- SESIÓN ----------------
   async function iniciar() {
+    try {
+      if (sessionStorage.getItem('rjm-cierre-inactivo')) {
+        sessionStorage.removeItem('rjm-cierre-inactivo');
+        aviso('loginMsg', 'Por seguridad cerramos tu sesión después de 30 minutos sin uso. Vuelve a entrar.', 'info');
+      }
+    } catch (_) {}
     if (!RJM.configurado) {
       aviso('loginMsg', 'Falta configurar Supabase en js/config.js (ver docs/CONFIGURACION.md).', 'info');
       $('btnEntrar').disabled = true;
@@ -73,6 +79,17 @@
   });
 
   $('btnSalir').addEventListener('click', async () => { await RJM.salir(); location.reload(); });
+
+  // Cierre automático tras 30 minutos sin usar el panel (por si quedó abierto).
+  const INACTIVO_MS = 30 * 60 * 1000;
+  let ultimoUso = Date.now();
+  ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach(ev => addEventListener(ev, () => { ultimoUso = Date.now(); }, { passive: true }));
+  setInterval(async () => {
+    if ($('vistaPanel').classList.contains('oculto') || Date.now() - ultimoUso < INACTIVO_MS) return;
+    await RJM.salir();
+    try { sessionStorage.setItem('rjm-cierre-inactivo', '1'); } catch (_) {}
+    location.reload();
+  }, 30 * 1000);
 
   // ---------------- CAMBIAR MI CONTRASEÑA ----------------
   // Pide la contraseña actual para que nadie la cambie con una sesión abierta ajena.
@@ -172,19 +189,69 @@
     $('pOrden').value = p?.orden ?? 0;
     $('pPublicado').checked = p ? p.publicado : true;
     $('pDestacado').checked = p ? p.destacado : false;
-    $('pFoto').value = '';
-    $('pFotoPrev').src = p?.foto_url || '';
-    $('pFotoPrev').classList.toggle('oculto', !p?.foto_url);
+    $('pFotos').value = '';
+    galeria = fotosDe(p);
+    pintarGaleria();
+    $('pVideo').value = p?.video_url || '';
+    revisarVideo();
     $('modalProd').classList.remove('oculto');
     $('pNombre').focus();
   }
 
-  $('pFoto').addEventListener('change', () => {
-    const f = $('pFoto').files[0];
-    if (!f) return;
-    $('pFotoPrev').src = URL.createObjectURL(f);
-    $('pFotoPrev').classList.remove('oculto');
+  // ---------------- GALERÍA (hasta 4 fotos) Y VIDEO ----------------
+  // galeria: [{ url, path, blob? }]. La primera es la principal (foto_url); las
+  // demás se guardan en fotos_extra. Las nuevas se suben recién al guardar.
+  const MAX_FOTOS = 4;
+  let galeria = [];
+  function fotosDe(p) {
+    if (!p) return [];
+    const l = p.foto_url ? [{ url: p.foto_url, path: p.foto_path || null }] : [];
+    (Array.isArray(p.fotos_extra) ? p.fotos_extra : []).forEach(f => { if (f && f.url) l.push({ url: f.url, path: f.path || null }); });
+    return l.slice(0, MAX_FOTOS);
+  }
+  function pintarGaleria() {
+    $('pGaleria').innerHTML = galeria.map((f, i) => `
+      <li>
+        <img src="${esc(f.url)}" alt="Foto ${i + 1}"/>
+        ${i === 0 ? '<span class="g-etq">Principal</span>' : ''}
+        <div class="g-acc">
+          <button type="button" data-mover="${i}" ${i === 0 ? 'disabled' : ''} aria-label="Mover la foto ${i + 1} a la izquierda" title="Mover a la izquierda">◀</button>
+          <button type="button" data-quitar="${i}" aria-label="Quitar la foto ${i + 1}" title="Quitar">✕</button>
+        </div>
+      </li>`).join('');
+    const quedan = MAX_FOTOS - galeria.length;
+    $('pFotos').disabled = quedan <= 0;
+    $('pFotosInfo').textContent = quedan > 0 ? `Puedes agregar ${quedan} foto${quedan === 1 ? '' : 's'} más. JPG, PNG o WebP; se reducen solas.` : 'Ya tienes 4 fotos. Quita una para agregar otra.';
+  }
+  $('pGaleria').addEventListener('click', e => {
+    const m = e.target.closest('[data-mover]'), q = e.target.closest('[data-quitar]');
+    if (m) { const i = +m.dataset.mover; [galeria[i - 1], galeria[i]] = [galeria[i], galeria[i - 1]]; }
+    else if (q) { const [f] = galeria.splice(+q.dataset.quitar, 1); if (f && f.blob) URL.revokeObjectURL(f.url); }
+    else return;
+    pintarGaleria();
   });
+  $('pFotos').addEventListener('change', async () => {
+    const archivos = [...$('pFotos').files]; $('pFotos').value = '';
+    const libres = MAX_FOTOS - galeria.length;
+    if (archivos.length > libres) aviso('prodMsg', `Solo se agregaron ${libres} foto${libres === 1 ? '' : 's'}: el máximo es 4 por producto.`, 'info');
+    for (const f of archivos.slice(0, libres)) {
+      try { const blob = await reducirImagen(f); galeria.push({ url: URL.createObjectURL(blob), path: null, blob }); }
+      catch (err) { aviso('prodMsg', `${f.name}: ${err.message}`); }
+    }
+    pintarGaleria();
+  });
+  function revisarVideo() {
+    const txt = $('pVideo').value.trim(), info = $('pVideoInfo');
+    info.classList.remove('err', 'ok');
+    if (!txt) { info.textContent = 'Sube el video a tu red y pega aquí su enlace. Se verá dentro de la ficha del producto.'; return true; }
+    const v = RJM.video(txt);
+    if (!v) { info.textContent = 'Ese enlace no es de YouTube, TikTok o Facebook (debe empezar con https://).'; info.classList.add('err'); return false; }
+    info.textContent = v.embed ? `Video de ${v.red}: se verá dentro de la ficha.`
+      : `Enlace corto de ${v.red}: en la ficha saldrá un botón para verlo en ${v.red}. Para verlo dentro de la web, abre el video y copia el enlace completo.`;
+    info.classList.add('ok');
+    return true;
+  }
+  $('pVideo').addEventListener('input', revisarVideo);
 
   // Reduce la foto a máx. 1200 px y la convierte a JPEG (ahorra espacio y carga rápido).
   function reducirImagen(file, max = 1200, calidad = 0.85) {
@@ -223,20 +290,35 @@
         publicado: $('pPublicado').checked,
         destacado: $('pDestacado').checked,
       };
-      const archivo = $('pFoto').files[0];
-      if (archivo) {
-        const blob = await reducirImagen(archivo);
-        const ruta = `catalogo/${crypto.randomUUID()}.jpg`;
-        const { error: eUp } = await sb.storage.from('productos').upload(ruta, blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
-        if (eUp) throw eUp;
-        fila.foto_path = ruta;
-        fila.foto_url = sb.storage.from('productos').getPublicUrl(ruta).data.publicUrl;
+      if (!revisarVideo()) { $('pVideo').focus(); throw new Error('Revisa el enlace del video.'); }
+      fila.video_url = $('pVideo').value.trim() || null;
+      // Sube solo las fotos nuevas; si algo falla, borra lo que alcanzó a subir.
+      const subidas = [];
+      try {
+        for (const f of galeria) {
+          if (!f.blob) continue;
+          const ruta = `catalogo/${crypto.randomUUID()}.jpg`;
+          const { error: eUp } = await sb.storage.from('productos').upload(ruta, f.blob, { contentType: 'image/jpeg', cacheControl: '31536000' });
+          if (eUp) throw eUp;
+          subidas.push(ruta);
+          URL.revokeObjectURL(f.url);
+          Object.assign(f, { path: ruta, url: sb.storage.from('productos').getPublicUrl(ruta).data.publicUrl, blob: null });
+        }
+        const [principal, ...extra] = galeria;
+        fila.foto_url = principal ? principal.url : null;
+        fila.foto_path = principal ? principal.path : null;
+        fila.fotos_extra = extra.map(f => ({ url: f.url, path: f.path }));
+        const q = editProdId ? sb.from('productos').update(fila).eq('id', editProdId) : sb.from('productos').insert(fila);
+        const { error } = await q;
+        if (error) throw error;
+      } catch (e) {
+        if (subidas.length) await sb.storage.from('productos').remove(subidas).catch(() => {});
+        throw e;
       }
-      const q = editProdId ? sb.from('productos').update(fila).eq('id', editProdId) : sb.from('productos').insert(fila);
-      const { error } = await q;
-      if (error) throw error;
-      // Si se reemplazó la foto, se borra la anterior del almacenamiento.
-      if (archivo && anterior?.foto_path) await sb.storage.from('productos').remove([anterior.foto_path]);
+      // Borra del almacenamiento las fotos que se quitaron.
+      const quedan = new Set(galeria.map(f => f.path).filter(Boolean));
+      const quitadas = fotosDe(anterior).map(f => f.path).filter(r => r && !quedan.has(r));
+      if (quitadas.length) await sb.storage.from('productos').remove(quitadas).catch(() => {});
       $('modalProd').classList.add('oculto');
       aviso('panelMsg', 'Producto guardado.', 'ok');
       cargarCatalogo();

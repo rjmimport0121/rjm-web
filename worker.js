@@ -17,7 +17,7 @@
 
 const SITIO = 'https://www.rjmimport.com';
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const CAMPOS = 'id,sku,nombre,categoria,marca,descripcion,caracteristicas,precio,moneda,precio_incluye_igv,foto_url,destacado,actualizado_en';
+const CAMPOS = 'id,sku,nombre,categoria,marca,descripcion,caracteristicas,precio,moneda,precio_incluye_igv,foto_url,fotos_extra,video_url,destacado,actualizado_en';
 const CACHE_SEG = 300;
 
 export default {
@@ -57,6 +57,32 @@ function recortar(texto, max) {
 // JSON dentro de <script>: evita que un texto cierre la etiqueta.
 const jsonLd = obj => JSON.stringify(obj).replace(/</g, '\\u003c');
 
+// Todas las fotos del producto: la principal y las extra (máx. 4).
+const fotosDe = p => [p.foto_url, ...(Array.isArray(p.fotos_extra) ? p.fotos_extra.map(f => f && f.url) : [])]
+  .filter(u => typeof u === 'string' && u.startsWith('https://')).slice(0, 4);
+
+// Enlace de video de YouTube, TikTok o Facebook. Igual que RJM.video() en js/comun.js.
+function videoDe(url) {
+  let u; try { u = new URL(String(url || '').trim()); } catch (_) { return null; }
+  if (u.protocol !== 'https:') return null;
+  const h = u.hostname.toLowerCase().replace(/^(www|m|web)\./, '');
+  if (h === 'youtu.be' || h === 'youtube.com' || h === 'music.youtube.com') {
+    const id = h === 'youtu.be' ? u.pathname.slice(1).split('/')[0]
+      : u.searchParams.get('v') || (u.pathname.match(/^\/(?:shorts|embed|live)\/([\w-]{11})/) || [])[1];
+    if (!/^[\w-]{11}$/.test(id || '')) return null;
+    return { red: 'YouTube', embed: `https://www.youtube-nocookie.com/embed/${id}`, enlace: `https://www.youtube.com/watch?v=${id}`, vertical: u.pathname.startsWith('/shorts/') };
+  }
+  if (h === 'tiktok.com' || h === 'vm.tiktok.com' || h === 'vt.tiktok.com') {
+    const m = u.pathname.match(/\/video\/(\d{8,25})/);
+    return { red: 'TikTok', embed: m ? `https://www.tiktok.com/embed/v2/${m[1]}` : null, enlace: u.href, vertical: true };
+  }
+  if (h === 'facebook.com' || h === 'fb.watch') {
+    const largo = h === 'facebook.com' && /\/(videos|reel|watch)\b|[?&]v=\d/.test(u.pathname + u.search);
+    return { red: 'Facebook', embed: largo ? `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(u.href)}&show_text=false` : null, enlace: u.href, vertical: /\/reel\b/.test(u.pathname) };
+  }
+  return null;
+}
+
 async function supabase(env, consulta) {
   const r = await fetch(`${env.SUPABASE_URL}/rest/v1/${consulta}`, {
     headers: { apikey: env.SUPABASE_ANON_KEY, Authorization: `Bearer ${env.SUPABASE_ANON_KEY}`, Accept: 'application/json' }
@@ -91,18 +117,18 @@ function errorTemporal() {
 
 // ---------- /sitemap.xml ----------
 async function sitemap(env) {
-  const productos = await supabase(env, `productos?select=id,nombre,foto_url,actualizado_en&publicado=eq.true&order=actualizado_en.desc&limit=5000`);
+  const productos = await supabase(env, `productos?select=id,nombre,foto_url,fotos_extra,actualizado_en&publicado=eq.true&order=actualizado_en.desc&limit=5000`);
   const ultima = productos[0] ? productos[0].actualizado_en.slice(0, 10) : null;
   const urls = [
     { loc: SITIO + '/', lastmod: ultima },
     { loc: SITIO + '/libro-reclamaciones.html' },
-    ...productos.map(p => ({ loc: SITIO + rutaProducto(p), lastmod: String(p.actualizado_en || '').slice(0, 10) || null, foto: p.foto_url }))
+    ...productos.map(p => ({ loc: SITIO + rutaProducto(p), lastmod: String(p.actualizado_en || '').slice(0, 10) || null, fotos: fotosDe(p) }))
   ];
-  // La foto de cada producto va como <image:image>, para que Google Imágenes la encuentre.
+  // Las fotos de cada producto van como <image:image>, para que Google Imágenes la encuentre.
   const cuerpo = '<?xml version="1.0" encoding="UTF-8"?>\n'
     + '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
     + urls.map(u => `  <url><loc>${xml(u.loc)}</loc>${u.lastmod ? `<lastmod>${u.lastmod}</lastmod>` : ''}`
-      + `${u.foto ? `<image:image><image:loc>${xml(u.foto)}</image:loc></image:image>` : ''}</url>`).join('\n')
+      + (u.fotos || []).map(f => `<image:image><image:loc>${xml(f)}</image:loc></image:image>`).join('') + '</url>').join('\n')
     + '\n</urlset>\n';
   return new Response(cuerpo, { headers: cabeceras('application/xml; charset=utf-8') });
 }
@@ -152,13 +178,15 @@ function htmlProducto(p, relacionados, env) {
   msj += `\n\nVer producto: ${url}\n\n¿Tienen disponibilidad?`;
   const wa = `https://wa.me/${WA}?text=${encodeURIComponent(msj)}`;
 
+  const fotos = fotosDe(p), video = p.video_url ? videoDe(p.video_url) : null;
+
   // Datos para Google (schema.org). Solo lo que consta en el catálogo:
   // no se declara stock ni estado porque el catálogo no los registra.
   // Sin precio no se envía Product: Google lo exige (offers) y marcaría error.
   const producto = {
     '@context': 'https://schema.org', '@type': 'Product',
     name: p.nombre, url, category: p.categoria,
-    ...(p.foto_url && { image: [p.foto_url] }),
+    ...(fotos.length && { image: fotos }),
     ...(p.descripcion && { description: p.descripcion }),
     ...(p.sku && { sku: p.sku }),
     ...(p.marca && { brand: { '@type': 'Brand', name: p.marca } }),
@@ -177,8 +205,8 @@ function htmlProducto(p, relacionados, env) {
     ]
   };
 
-  const foto = p.foto_url
-    ? `<img src="${esc(p.foto_url)}" alt="${esc(p.nombre)}" width="800" height="800" fetchpriority="high"/>`
+  const foto = fotos.length
+    ? `<img id="fotoPrincipal" src="${esc(fotos[0])}" alt="${esc(p.nombre)}" width="800" height="800" fetchpriority="high"/>`
     : `<div class="sinfoto">${esc(p.categoria || 'RJM Import-Export')}</div>`;
 
   const otros = relacionados && relacionados.length ? `
@@ -198,7 +226,15 @@ function htmlProducto(p, relacionados, env) {
   <main class="cont">
     <nav class="migas" aria-label="Ruta"><a href="/">Tienda</a><span aria-hidden="true">›</span><a href="/#catalogo">${esc(p.categoria)}</a></nav>
     <article class="prod">
-      <div class="prod-img">${foto}</div>
+      <div class="prod-media">
+        <div class="prod-img">${foto}</div>
+        ${fotos.length > 1 ? `<ul class="minis" aria-label="Fotos del producto">${fotos.map((f, i) => `
+          <li><a href="${esc(f)}" data-foto="${esc(f)}" aria-label="Ver foto ${i + 1} de ${fotos.length}"${i ? '' : ' aria-current="true"'}><img src="${esc(f)}" alt="" width="120" height="120" loading="lazy"/></a></li>`).join('')}
+        </ul>` : ''}
+        ${video ? (video.embed ? `<div class="video${video.vertical ? ' vertical' : ''}"><iframe src="${esc(video.embed)}" title="Video de ${esc(p.nombre)} en ${esc(video.red)}" loading="lazy"
+          allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div>`
+          : `<a class="btn btn-video" href="${esc(video.enlace)}" target="_blank" rel="noopener">Ver el video en ${esc(video.red)}</a>`) : ''}
+      </div>
       <div class="prod-info">
         ${p.marca ? `<p class="marca">${esc(p.marca)}</p>` : ''}
         <h1>${esc(p.nombre)}</h1>
@@ -221,13 +257,19 @@ function htmlProducto(p, relacionados, env) {
 
   return pagina({
     titulo, descripcion, canonica: url, robots: 'index, follow',
-    og: { tipo: 'product', imagen: p.foto_url, titulo: p.nombre, precio: conPrecio ? Number(p.precio).toFixed(2) : null, moneda: p.moneda === 'USD' ? 'USD' : 'PEN' },
-    jsonld: conPrecio ? [producto, migas] : [migas], cuerpo
+    og: { tipo: 'product', imagen: fotos[0], titulo: p.nombre, precio: conPrecio ? Number(p.precio).toFixed(2) : null, moneda: p.moneda === 'USD' ? 'USD' : 'PEN' },
+    jsonld: conPrecio ? [producto, migas] : [migas], cuerpo,
+    script: fotos.length > 1 ? GALERIA_JS : ''
   });
 }
 
 // ---------- Plantilla común ----------
-function pagina({ titulo, descripcion, canonica, robots, og, jsonld = [], cuerpo }) {
+// Miniaturas: cambian la foto principal sin salir de la página (sin JS, abren la foto).
+const GALERIA_JS = `document.querySelectorAll('[data-foto]').forEach(function(a){a.addEventListener('click',function(e){
+var f=document.getElementById('fotoPrincipal');if(!f)return;e.preventDefault();f.src=a.dataset.foto;
+document.querySelectorAll('[data-foto]').forEach(function(b){b.removeAttribute('aria-current')});a.setAttribute('aria-current','true');});});`;
+
+function pagina({ titulo, descripcion, canonica, robots, og, jsonld = [], cuerpo, script = '' }) {
   const ogTags = og ? `
 <meta property="og:type" content="${og.tipo}"/>
 <meta property="og:locale" content="es_PE"/>
@@ -260,6 +302,7 @@ ${jsonld.map(o => `<script type="application/ld+json">${jsonLd(o)}</script>`).jo
   <a class="volver" href="/#catalogo"><span class="solo-pc">Ver todo el catálogo</span><span class="solo-movil">Catálogo</span></a>
 </div></header>
 ${cuerpo}
+${script ? `<script>${script}</script>` : ''}
 <footer class="pie"><div class="pie-in">
   <span>© RJM Import-Export E.I.R.L. · RUC 20610045171 · Huamanga, Ayacucho</span>
   <a href="/libro-reclamaciones.html">Libro de Reclamaciones</a>
@@ -287,6 +330,15 @@ h1,h2{font-family:var(--f-tit);line-height:1.2;text-wrap:balance}
 @media(min-width:820px){.prod{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;padding:28px}}
 .prod-img{border-radius:var(--r);overflow:hidden;background:#fff;border:1px solid var(--linea);aspect-ratio:1;display:grid;place-items:center}
 .prod-img img{width:100%;height:100%;object-fit:contain}
+.prod-media{display:grid;gap:12px;align-content:start;min-width:0}
+.minis{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.minis a{display:block;aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid var(--linea);background:#fff}
+.minis a[aria-current="true"]{border-color:#ea580c}
+.minis img{width:100%;height:100%;object-fit:cover}
+.video{position:relative;aspect-ratio:16/9;border-radius:var(--r);overflow:hidden;background:#000}
+.video.vertical{aspect-ratio:9/16;justify-self:center;width:min(100%,300px)}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.btn-video{background:#0b2545;color:#fff;flex:none}
 .sinfoto{font:700 18px var(--f-tit);color:var(--tenue);padding:24px;text-align:center}
 .marca{margin:0;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--naranja-txt)}
 .prod-info h1{font-size:clamp(24px,4vw,34px);margin:6px 0 8px}
